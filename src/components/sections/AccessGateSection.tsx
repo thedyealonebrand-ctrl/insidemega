@@ -2,22 +2,28 @@ import { useState } from "react";
 import { HolographicPanel } from "@/components/ui/HolographicPanel";
 import { HoloInput } from "@/components/ui/HoloInput";
 import { GlowButton } from "@/components/ui/GlowButton";
-import { Lock, Key, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Lock, Key, ShieldCheck, AlertTriangle, Unlock } from "lucide-react";
 
-export function AccessGateSection() {
+interface AccessGateSectionProps {
+  isUnlocked?: boolean;
+  onAccessGranted?: () => void;
+}
+
+export function AccessGateSection({ isUnlocked = false, onAccessGranted }: AccessGateSectionProps) {
   const [code, setCode] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code) return;
+    if (!code || !isUnlocked) return;
     
     setStatus("loading");
     
     // Simulate verification
     setTimeout(() => {
-      if (code.toLowerCase() === "omega" || code.length >= 6) {
+      if (code.toLowerCase() === "omega" || code.length >= 4) {
         setStatus("success");
+        onAccessGranted?.();
       } else {
         setStatus("error");
       }
@@ -30,7 +36,7 @@ export function AccessGateSection() {
         {/* Terminal header */}
         <div className="flex items-center gap-2 mb-6 pb-4 border-b border-primary/20">
           <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-500/60" />
+            <div className="w-3 h-3 rounded-full bg-destructive/60" />
             <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
             <div className="w-3 h-3 rounded-full bg-green-500/60" />
           </div>
@@ -46,17 +52,21 @@ export function AccessGateSection() {
             ${status === "success" 
               ? "bg-green-500/20 border-green-500/50" 
               : status === "error"
-              ? "bg-red-500/20 border-red-500/50"
-              : "bg-primary/10 border-primary/30"
+              ? "bg-destructive/20 border-destructive/50"
+              : isUnlocked
+              ? "bg-primary/20 border-primary/50"
+              : "bg-muted/30 border-muted-foreground/30"
             }
             border float-slow
           `}>
             {status === "success" ? (
               <ShieldCheck className="w-10 h-10 text-green-400" />
             ) : status === "error" ? (
-              <AlertTriangle className="w-10 h-10 text-red-400" />
+              <AlertTriangle className="w-10 h-10 text-destructive" />
+            ) : isUnlocked ? (
+              <Unlock className="w-10 h-10 text-primary" />
             ) : (
-              <Lock className="w-10 h-10 text-primary" />
+              <Lock className="w-10 h-10 text-muted-foreground" />
             )}
           </div>
           
@@ -69,7 +79,9 @@ export function AccessGateSection() {
               ? "Access Granted. Welcome to the Realm."
               : status === "error"
               ? "Invalid code. Try again."
-              : "Enter your access code to proceed"
+              : isUnlocked
+              ? "Trial complete! Enter any code to proceed."
+              : "Complete the trial to unlock this gate."
             }
           </p>
         </div>
@@ -79,30 +91,36 @@ export function AccessGateSection() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <HoloInput
               type="text"
-              placeholder="Enter access code..."
+              placeholder={isUnlocked ? "Enter access code..." : "Complete the trial first..."}
               value={code}
               onChange={(e) => {
                 setCode(e.target.value);
                 if (status === "error") setStatus("idle");
               }}
               icon={<Key className="w-5 h-5" />}
-              className={status === "error" ? "border-red-500/50" : ""}
+              disabled={!isUnlocked}
+              className={`
+                ${status === "error" ? "border-destructive/50" : ""}
+                ${!isUnlocked ? "opacity-50 cursor-not-allowed" : ""}
+              `}
             />
             
             <GlowButton
               type="submit"
-              variant="primary"
+              variant={isUnlocked ? "primary" : "secondary"}
               size="lg"
               className="w-full"
-              disabled={!code || status === "loading"}
+              disabled={!code || status === "loading" || !isUnlocked}
             >
               {status === "loading" ? (
                 <span className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   Verifying...
                 </span>
-              ) : (
+              ) : isUnlocked ? (
                 "Enter Our Many Endless Great Adventures"
+              ) : (
+                "Complete Trial to Unlock"
               )}
             </GlowButton>
           </form>
@@ -114,7 +132,14 @@ export function AccessGateSection() {
               </p>
             </div>
             
-            <GlowButton variant="primary" size="lg" className="w-full">
+            <GlowButton 
+              variant="primary" 
+              size="lg" 
+              className="w-full"
+              onClick={() => {
+                document.getElementById('stations')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
               Enter The Realm
             </GlowButton>
           </div>
@@ -123,8 +148,8 @@ export function AccessGateSection() {
         {/* Terminal footer */}
         <div className="mt-8 pt-4 border-t border-primary/20">
           <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
-            <span>STATUS: {status === "success" ? "GRANTED" : status === "error" ? "DENIED" : "AWAITING"}</span>
-            <span className="pulse-glow">●</span>
+            <span>STATUS: {status === "success" ? "GRANTED" : status === "error" ? "DENIED" : isUnlocked ? "UNLOCKED" : "LOCKED"}</span>
+            <span className={isUnlocked ? "pulse-glow text-primary" : ""}>●</span>
             <span>SECTOR: OMEGA-7</span>
           </div>
         </div>
