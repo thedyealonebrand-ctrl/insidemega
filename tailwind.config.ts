@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Bebas Neue", "sans-serif"],
-        body: ["Space Grotesk", "sans-serif"],
+        display: ["Orbitron", "sans-serif"],
+        body: ["Rajdhani", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -51,9 +51,19 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Space theme colors
+        space: {
+          black: "hsl(var(--space-black))",
+          cyan: "hsl(var(--neon-cyan))",
+          purple: "hsl(var(--aurora-purple))",
+          blue: "hsl(var(--electric-blue))",
+          pink: "hsl(var(--nebula-pink))",
+          white: "hsl(var(--star-white))",
+        },
         glow: {
-          primary: "hsl(var(--glow-primary))",
-          accent: "hsl(var(--glow-accent))",
+          cyan: "hsl(var(--glow-cyan))",
+          purple: "hsl(var(--glow-purple))",
+          blue: "hsl(var(--glow-blue))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
