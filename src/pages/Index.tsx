@@ -1,21 +1,44 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import SpaceBackground from "@/components/space/SpaceBackground";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { TrialSection } from "@/components/sections/TrialSection";
-import { InitiationSection } from "@/components/sections/InitiationSection";
+import { InitiationGame } from "@/components/game/InitiationGame";
 import { AccessGateSection } from "@/components/sections/AccessGateSection";
 import { StationsSection } from "@/components/sections/StationsSection";
 
 const Index = () => {
+  const [trialComplete, setTrialComplete] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(false);
+  
   const trialRef = useRef<HTMLDivElement>(null);
-  const howItWorksRef = useRef<HTMLDivElement>(null);
+  const accessRef = useRef<HTMLDivElement>(null);
+  const stationsRef = useRef<HTMLDivElement>(null);
 
   const scrollToTrial = () => {
     trialRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const scrollToHowItWorks = () => {
-    howItWorksRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToAccess = () => {
+    accessRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToStations = () => {
+    stationsRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleTrialComplete = () => {
+    setTrialComplete(true);
+    // Auto scroll to access gate after a delay
+    setTimeout(() => {
+      scrollToAccess();
+    }, 2000);
+  };
+
+  const handleAccessGranted = () => {
+    setAccessGranted(true);
+    // Auto scroll to stations after access
+    setTimeout(() => {
+      scrollToStations();
+    }, 1500);
   };
 
   return (
@@ -38,24 +61,32 @@ const Index = () => {
         {/* Hero Section */}
         <HeroSection 
           onBeginTrial={scrollToTrial} 
-          onHowItWorks={scrollToHowItWorks} 
+          onHowItWorks={scrollToTrial} 
         />
 
-        {/* Trial Section */}
-        <div ref={trialRef}>
-          <TrialSection />
-        </div>
-
-        {/* Initiation Section */}
-        <div ref={howItWorksRef}>
-          <InitiationSection />
-        </div>
+        {/* Trial/Game Section */}
+        <section ref={trialRef} id="trial" className="min-h-screen flex items-center justify-center px-4 py-20">
+          <InitiationGame 
+            onComplete={handleTrialComplete}
+            targetScore={7000}
+          />
+        </section>
 
         {/* Access Gate */}
-        <AccessGateSection />
+        <div ref={accessRef}>
+          <AccessGateSection 
+            isUnlocked={trialComplete}
+            onAccessGranted={handleAccessGranted}
+          />
+        </div>
 
-        {/* Stations */}
-        <StationsSection />
+        {/* Stations - Only fully visible after access */}
+        <div 
+          ref={stationsRef}
+          className={`transition-opacity duration-1000 ${accessGranted ? "opacity-100" : "opacity-30 pointer-events-none"}`}
+        >
+          <StationsSection />
+        </div>
 
         {/* Footer */}
         <footer className="relative py-12 text-center border-t border-primary/10">

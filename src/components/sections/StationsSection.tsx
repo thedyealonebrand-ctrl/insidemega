@@ -1,12 +1,12 @@
 import { HolographicPanel, HolographicCard } from "@/components/ui/HolographicPanel";
 import { GlowButton } from "@/components/ui/GlowButton";
-import { Disc3, Radio, Shuffle, Shirt, ExternalLink } from "lucide-react";
+import { Disc3, Radio, Shuffle, Shirt, ExternalLink, Play, Music } from "lucide-react";
 
 const volumes = [
-  { title: "OMEGA Back at it", color: "from-cyan-500 to-blue-500" },
-  { title: "OMEGA Can't stop rep'n the L", color: "from-purple-500 to-pink-500" },
-  { title: "OMEGA Development", color: "from-green-500 to-cyan-500" },
-  { title: "OMEGA Evolution", color: "from-orange-500 to-red-500" },
+  { title: "OMEGA Back at it", color: "from-space-cyan to-glow-blue" },
+  { title: "OMEGA Can't stop rep'n the L", color: "from-secondary to-space-pink" },
+  { title: "OMEGA Development", color: "from-green-500 to-space-cyan" },
+  { title: "OMEGA Evolution", color: "from-orange-500 to-destructive" },
 ];
 
 function VolumesStation() {
@@ -39,12 +39,19 @@ function VolumesStation() {
               </div>
               
               {/* Disc grooves */}
-              <div className="absolute inset-4 rounded-full border border-white/10" />
-              <div className="absolute inset-8 rounded-full border border-white/10" />
-              <div className="absolute inset-12 rounded-full border border-white/10" />
+              <div className="absolute inset-4 rounded-full border border-foreground/10" />
+              <div className="absolute inset-8 rounded-full border border-foreground/10" />
+              <div className="absolute inset-12 rounded-full border border-foreground/10" />
+              
+              {/* Play button overlay */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center">
+                  <Play className="w-6 h-6 text-primary-foreground ml-1" />
+                </div>
+              </div>
               
               {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             
             <h4 className="font-display text-sm text-center text-foreground group-hover:text-primary transition-colors">
@@ -85,6 +92,11 @@ function HiddenSignalStation() {
             </p>
           </div>
         </div>
+        
+        <GlowButton variant="secondary" className="mt-6">
+          <Music className="w-4 h-4 mr-2" />
+          Tune In
+        </GlowButton>
       </HolographicPanel>
     </div>
   );
