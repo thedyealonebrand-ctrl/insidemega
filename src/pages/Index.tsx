@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import SpaceBackground from "@/components/space/SpaceBackground";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { InitiationGame } from "@/components/game/InitiationGame";
+import PlaybuoyGame from "@/components/game/PlaybuoyGame";
 import { AccessGateSection } from "@/components/sections/AccessGateSection";
 import { StationsSection } from "@/components/sections/StationsSection";
 
@@ -65,11 +65,8 @@ const Index = () => {
         />
 
         {/* Trial/Game Section */}
-        <section ref={trialRef} id="trial" className="min-h-screen flex items-center justify-center px-4 py-20">
-          <InitiationGame 
-            onComplete={handleTrialComplete}
-            targetScore={7000}
-          />
+        <section ref={trialRef} id="trial" className="min-h-screen flex items-center justify-center">
+          <PlaybuoyGame />
         </section>
 
         {/* Access Gate */}

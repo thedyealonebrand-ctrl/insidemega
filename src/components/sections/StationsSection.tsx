@@ -1,6 +1,9 @@
 import { HolographicPanel, HolographicCard } from "@/components/ui/HolographicPanel";
 import { GlowButton } from "@/components/ui/GlowButton";
 import { Disc3, Radio, Shuffle, Shirt, ExternalLink, Play, Music } from "lucide-react";
+import signalIcon from "@/assets/signal-abde.png";
+import livingstonerIcon from "@/assets/livingstoner-collectable.png";
+import shuffleIcon from "@/assets/shuffle-pass.png";
 
 const volumes = [
   { title: "OMEGA Back at it", color: "from-space-cyan to-glow-blue" },
@@ -68,35 +71,50 @@ function HiddenSignalStation() {
   return (
     <div className="mb-20">
       <HolographicPanel variant="purple" className="text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1 bg-secondary/20 rounded-full mb-4">
-          <Radio className="w-4 h-4 text-secondary pulse-glow" />
-          <span className="font-body text-sm uppercase tracking-wider text-secondary">
-            Encrypted Transmission
-          </span>
-        </div>
-        
-        <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-purple mb-6">
-          HIDDEN SIGNAL STATION
-        </h3>
-        
-        <div className="max-w-lg mx-auto">
-          <p className="font-mono text-muted-foreground glitch-text text-lg mb-6">
-            &gt;&gt; DECRYPTING TRANSMISSION... &lt;&lt;
-          </p>
-          
-          <div className="p-4 bg-muted/20 rounded-lg border border-secondary/30">
-            <p className="font-mono text-secondary text-sm leading-relaxed">
-              <span className="opacity-60">[ENCRYPTED]</span> Those who seek shall find...<br />
-              <span className="opacity-60">[ENCRYPTED]</span> The frequency awaits...<br />
-              <span className="opacity-60">[ENCRYPTED]</span> Listen between the lines...
-            </p>
+        <div className="flex flex-col items-center">
+          {/* Signal Icon */}
+          <div className="relative w-48 h-48 mb-6">
+            <img 
+              src={signalIcon} 
+              alt="Hidden Signal" 
+              className="w-full h-full object-contain"
+              style={{
+                filter: 'drop-shadow(0 0 30px hsl(var(--secondary) / 0.6))',
+                animation: 'pulse 3s ease-in-out infinite'
+              }}
+            />
           </div>
+          
+          <div className="inline-flex items-center gap-2 px-4 py-1 bg-secondary/20 rounded-full mb-4">
+            <Radio className="w-4 h-4 text-secondary pulse-glow" />
+            <span className="font-body text-sm uppercase tracking-wider text-secondary">
+              Encrypted Transmission
+            </span>
+          </div>
+          
+          <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-purple mb-6">
+            HIDDEN SIGNAL STATION
+          </h3>
+          
+          <div className="max-w-lg mx-auto">
+            <p className="font-mono text-muted-foreground glitch-text text-lg mb-6">
+              &gt;&gt; DECRYPTING TRANSMISSION... &lt;&lt;
+            </p>
+            
+            <div className="p-4 bg-muted/20 rounded-lg border border-secondary/30">
+              <p className="font-mono text-secondary text-sm leading-relaxed">
+                <span className="opacity-60">[ENCRYPTED]</span> Those who seek shall find...<br />
+                <span className="opacity-60">[ENCRYPTED]</span> The frequency awaits...<br />
+                <span className="opacity-60">[ENCRYPTED]</span> Listen between the lines...
+              </p>
+            </div>
+          </div>
+          
+          <GlowButton variant="secondary" className="mt-6">
+            <Music className="w-4 h-4 mr-2" />
+            Tune In
+          </GlowButton>
         </div>
-        
-        <GlowButton variant="secondary" className="mt-6">
-          <Music className="w-4 h-4 mr-2" />
-          Tune In
-        </GlowButton>
       </HolographicPanel>
     </div>
   );
@@ -106,38 +124,53 @@ function ShuffleStation() {
   return (
     <div className="mb-20">
       <HolographicPanel className="text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1 bg-primary/10 rounded-full mb-4">
-          <Shuffle className="w-4 h-4 text-primary" />
-          <span className="font-body text-sm uppercase tracking-wider text-muted-foreground">
-            Broadcast Control
-          </span>
-        </div>
-        
-        <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-cyan mb-6">
-          THE SHUFFLE STATION
-        </h3>
-        
-        {/* Broadcast control visualization */}
-        <div className="max-w-md mx-auto mb-8">
-          <div className="flex items-end justify-center gap-1 h-20">
-            {[...Array(20)].map((_, i) => (
-              <div
-                key={i}
-                className="w-2 bg-gradient-to-t from-primary to-glow-cyan rounded-t"
-                style={{
-                  height: `${20 + Math.sin(i * 0.5) * 30 + Math.random() * 30}%`,
-                  animation: `pulse ${1 + Math.random()}s ease-in-out infinite`,
-                  animationDelay: `${i * 0.1}s`,
-                }}
-              />
-            ))}
+        <div className="flex flex-col items-center">
+          {/* Shuffle Icon */}
+          <div className="relative w-48 h-48 mb-6">
+            <img 
+              src={shuffleIcon} 
+              alt="Shuffle Pass" 
+              className="w-full h-full object-contain"
+              style={{
+                filter: 'drop-shadow(0 0 30px hsl(var(--destructive) / 0.6))',
+                animation: 'float 4s ease-in-out infinite'
+              }}
+            />
           </div>
+          
+          <div className="inline-flex items-center gap-2 px-4 py-1 bg-primary/10 rounded-full mb-4">
+            <Shuffle className="w-4 h-4 text-primary" />
+            <span className="font-body text-sm uppercase tracking-wider text-muted-foreground">
+              Broadcast Control
+            </span>
+          </div>
+          
+          <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-cyan mb-6">
+            THE SHUFFLE STATION
+          </h3>
+          
+          {/* Broadcast control visualization */}
+          <div className="max-w-md mx-auto mb-8">
+            <div className="flex items-end justify-center gap-1 h-20">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className="w-2 bg-gradient-to-t from-primary to-glow-cyan rounded-t"
+                  style={{
+                    height: `${20 + Math.sin(i * 0.5) * 30 + Math.random() * 30}%`,
+                    animation: `pulse ${1 + Math.random()}s ease-in-out infinite`,
+                    animationDelay: `${i * 0.1}s`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <GlowButton variant="primary">
+            <Shuffle className="w-4 h-4 mr-2" />
+            Shuffle The Frequencies
+          </GlowButton>
         </div>
-        
-        <GlowButton variant="primary">
-          <Shuffle className="w-4 h-4 mr-2" />
-          Shuffle The Frequencies
-        </GlowButton>
       </HolographicPanel>
     </div>
   );
@@ -147,38 +180,40 @@ function DyeAloneStation() {
   return (
     <div>
       <HolographicPanel variant="blue" className="text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1 bg-glow-blue/10 rounded-full mb-4">
-          <Shirt className="w-4 h-4 text-glow-blue" />
-          <span className="font-body text-sm uppercase tracking-wider text-muted-foreground">
-            Fashion Terminal
-          </span>
+        <div className="flex flex-col items-center">
+          {/* Livingstoner Icon */}
+          <div className="relative w-48 h-48 mb-6">
+            <img 
+              src={livingstonerIcon} 
+              alt="Livingstoner Collectable" 
+              className="w-full h-full object-contain"
+              style={{
+                filter: 'drop-shadow(0 0 30px hsl(var(--glow-blue) / 0.6))',
+                animation: 'float 5s ease-in-out infinite'
+              }}
+            />
+          </div>
+          
+          <div className="inline-flex items-center gap-2 px-4 py-1 bg-glow-blue/10 rounded-full mb-4">
+            <Shirt className="w-4 h-4 text-glow-blue" />
+            <span className="font-body text-sm uppercase tracking-wider text-muted-foreground">
+              Fashion Terminal
+            </span>
+          </div>
+          
+          <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-blue mb-6">
+            DYE ALONE STATION
+          </h3>
+          
+          <p className="font-body text-muted-foreground mb-8 max-w-md mx-auto">
+            Exclusive digital fashion collectibles. Wearable art for the metaverse.
+          </p>
+          
+          <GlowButton variant="secondary">
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Claim Livingstoner Collectable NFT - Coming Soon
+          </GlowButton>
         </div>
-        
-        <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-blue mb-6">
-          DYE ALONE STATION
-        </h3>
-        
-        <p className="font-body text-muted-foreground mb-8 max-w-md mx-auto">
-          Exclusive digital fashion collectibles. Wearable art for the metaverse.
-        </p>
-        
-        {/* Floating clothing holograms representation */}
-        <div className="flex justify-center gap-6 mb-8">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="w-24 h-32 rounded-lg bg-gradient-to-br from-glow-blue/20 to-secondary/20 border border-glow-blue/30 float-slow flex items-center justify-center"
-              style={{ animationDelay: `${i * 0.5}s` }}
-            >
-              <Shirt className="w-10 h-10 text-glow-blue/50" />
-            </div>
-          ))}
-        </div>
-        
-        <GlowButton variant="secondary">
-          <ExternalLink className="w-4 h-4 mr-2" />
-          Claim Livingstoner Collectable NFT - Coming Soon
-        </GlowButton>
       </HolographicPanel>
     </div>
   );
