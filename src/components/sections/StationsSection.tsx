@@ -29,38 +29,46 @@ function VolumesStation() {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {volumes.map((volume, index) => (
-          <HolographicCard key={index} className="group perspective-1000">
-            <div className="relative aspect-square mb-4 rounded-lg overflow-hidden">
-              {/* Rotating disc effect */}
-              <div className={`
-                absolute inset-4 rounded-full bg-gradient-to-br ${volume.color}
-                group-hover:animate-spin
-                transition-all duration-300
-              `} style={{ animationDuration: "3s" }}>
-                {/* Center hole */}
-                <div className="absolute inset-1/3 rounded-full bg-background" />
-              </div>
-              
-              {/* Disc grooves */}
-              <div className="absolute inset-4 rounded-full border border-foreground/10" />
-              <div className="absolute inset-8 rounded-full border border-foreground/10" />
-              <div className="absolute inset-12 rounded-full border border-foreground/10" />
-              
-              {/* Play button overlay */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center">
-                  <Play className="w-6 h-6 text-primary-foreground ml-1" />
+          <a 
+            key={index}
+            href="https://www.songchainn.xyz/artist/1" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <HolographicCard className="group perspective-1000 cursor-pointer">
+              <div className="relative aspect-square mb-4 rounded-lg overflow-hidden">
+                {/* Rotating disc effect */}
+                <div className={`
+                  absolute inset-4 rounded-full bg-gradient-to-br ${volume.color}
+                  group-hover:animate-spin
+                  transition-all duration-300
+                `} style={{ animationDuration: "3s" }}>
+                  {/* Center hole */}
+                  <div className="absolute inset-1/3 rounded-full bg-background" />
                 </div>
+                
+                {/* Disc grooves */}
+                <div className="absolute inset-4 rounded-full border border-foreground/10" />
+                <div className="absolute inset-8 rounded-full border border-foreground/10" />
+                <div className="absolute inset-12 rounded-full border border-foreground/10" />
+                
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center">
+                    <Play className="w-6 h-6 text-primary-foreground ml-1" />
+                  </div>
+                </div>
+                
+                {/* Shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               
-              {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-            
-            <h4 className="font-display text-sm text-center text-foreground group-hover:text-primary transition-colors">
-              {volume.title}
-            </h4>
-          </HolographicCard>
+              <h4 className="font-display text-sm text-center text-foreground group-hover:text-primary transition-colors">
+                {volume.title}
+              </h4>
+            </HolographicCard>
+          </a>
         ))}
       </div>
     </div>
