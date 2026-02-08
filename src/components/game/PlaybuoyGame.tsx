@@ -132,7 +132,11 @@ function RewardModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
 }
 
 // Main Game Component
-export default function PlaybuoyGame() {
+interface PlaybuoyGameProps {
+  onTrialComplete?: () => void;
+}
+
+export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
   const [player, setPlayer] = useState<Player>({
     lane: 1,
     isDucking: false,
@@ -164,6 +168,7 @@ export default function PlaybuoyGame() {
 
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [animationTick, setAnimationTick] = useState(0);
+  const [trialCompleted, setTrialCompleted] = useState(false);
 
   const animationRef = useRef<number>();
   const lastSpawnRef = useRef<number>(0);
@@ -241,6 +246,7 @@ export default function PlaybuoyGame() {
       // Check for level transition
       if (prev.level === 'OMEGA' && newScore >= LEVEL_UNLOCK_SCORE && !hasTransitionedRef.current) {
         hasTransitionedRef.current = true;
+        setTrialCompleted(true);
         setTimeout(() => {
           setGameState(s => ({ ...s, levelTransition: true, level: 'OMEGA.A', speed: LEVEL_CONFIG['OMEGA.A'].baseSpeed }));
           setTimeout(() => {
@@ -671,6 +677,26 @@ export default function PlaybuoyGame() {
       {/* Reward Modal */}
       <RewardModal isOpen={showRewardModal} onClose={() => setShowRewardModal(false)} />
 
+      {/* Access Realm Button - appears after reaching 7000 points */}
+      {trialCompleted && !showRewardModal && gameState.status !== 'gameOver' && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150]">
+          <button
+            onClick={onTrialComplete}
+            className="px-8 py-4 font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #00ffff 0%, #ff00ff 50%, #00ffff 100%)',
+              backgroundSize: '200% 200%',
+              animation: 'gradientShift 3s ease infinite',
+              boxShadow: '0 0 30px rgba(0,255,255,0.6), 0 0 60px rgba(255,0,255,0.4)',
+              color: 'white',
+              textShadow: '0 0 10px rgba(0,0,0,0.5)',
+            }}
+          >
+            ⚡ ACCESS THE REALM ⚡
+          </button>
+        </div>
+      )}
+
       {/* Animations */}
       <style>{`
         @keyframes fadeIn {
@@ -722,6 +748,11 @@ export default function PlaybuoyGame() {
         @keyframes pillFloat {
           0%, 100% { transform: translateY(0) rotate(-5deg) scale(1); }
           50% { transform: translateY(-20px) rotate(5deg) scale(1.05); }
+        }
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
       `}</style>
     </div>

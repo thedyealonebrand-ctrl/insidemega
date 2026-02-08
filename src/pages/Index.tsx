@@ -66,7 +66,7 @@ const Index = () => {
 
         {/* Trial/Game Section */}
         <section ref={trialRef} id="trial" className="min-h-screen flex items-center justify-center">
-          <PlaybuoyGame />
+          <PlaybuoyGame onTrialComplete={handleTrialComplete} />
         </section>
 
         {/* Access Gate */}
