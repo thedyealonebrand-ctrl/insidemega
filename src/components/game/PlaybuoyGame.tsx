@@ -76,60 +76,6 @@ const PROSPECT_EMOJIS = {
   ],
 };
 
-// Reward Modal Component
-function RewardModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  if (!isOpen) return null;
-
-  const handleClaimReward = () => {
-    window.open('https://songchainn.xyz/?ref=SC-2YRV0B', '_blank', 'noopener,noreferrer');
-    onClose();
-  };
-
-  return (
-    <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-      style={{ animation: 'fadeIn 0.3s ease-out' }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div
-        className="relative max-w-lg w-full rounded-2xl overflow-hidden p-8 text-center"
-        style={{
-          background: 'linear-gradient(135deg, rgba(139, 0, 139, 0.95) 0%, rgba(0, 139, 139, 0.95) 100%)',
-          boxShadow: '0 0 60px rgba(255, 0, 255, 0.6), 0 0 100px rgba(0, 255, 255, 0.4)',
-          animation: 'scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        }}
-      >
-        <div className="text-6xl mb-6" style={{ animation: 'bounce 2s ease-in-out infinite' }}>🏆</div>
-        <h2 className="text-4xl font-bold text-white mb-4" style={{ textShadow: '0 0 20px rgba(255,255,255,0.8)' }}>
-          CONGRATULATIONS!
-        </h2>
-        <p className="text-xl text-white/90 mb-3 font-semibold">You've Unlocked OMEGA.A Access!</p>
-        <p className="text-sm text-white/80 mb-6 leading-relaxed">
-          You've proven your skill by reaching Level 2 and acquiring OMEGA7 (Heartbreak Immunity). 
-          Claim your exclusive access to the OMEGA.A community.
-        </p>
-        <div className="inline-block px-6 py-3 mb-6 rounded-full font-bold text-lg bg-black/40 border-2 border-white/30">
-          <span className="text-yellow-300">⚡ OMEGA7</span>
-          <span className="text-white mx-2">•</span>
-          <span className="text-cyan-300">LEVEL 2</span>
-        </div>
-        <button
-          onClick={handleClaimReward}
-          className="w-full py-4 px-6 rounded-xl font-bold text-lg text-white mb-4 transition-transform hover:scale-105 active:scale-95"
-          style={{
-            background: 'linear-gradient(135deg, #FF00FF 0%, #00FFFF 100%)',
-            boxShadow: '0 4px 20px rgba(255,0,255,0.5)',
-          }}
-        >
-          🎁 CLAIM YOUR REWARD
-        </button>
-        <button onClick={onClose} className="text-sm text-white/60 hover:text-white/90 underline">
-          Maybe Later
-        </button>
-      </div>
-    </div>
-  );
-}
 
 // Main Game Component
 interface PlaybuoyGameProps {
@@ -166,7 +112,6 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
     }
   }, [gameState.status]);
 
-  const [showRewardModal, setShowRewardModal] = useState(false);
   const [animationTick, setAnimationTick] = useState(0);
   const [trialCompleted, setTrialCompleted] = useState(false);
 
@@ -176,7 +121,6 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const duckTimeoutRef = useRef<NodeJS.Timeout>();
   const hasTransitionedRef = useRef<boolean>(false);
-  const hasShownRewardRef = useRef<boolean>(false);
 
   // Initialize audio
   useEffect(() => {
@@ -205,12 +149,12 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
 
   // Animation tick
   useEffect(() => {
-    if (gameState.status !== 'playing' || showRewardModal) return;
+    if (gameState.status !== 'playing') return;
     const interval = setInterval(() => {
       setAnimationTick(t => (t + 1) % 1000);
     }, gameState.level === 'OMEGA.A' ? 30 : 50);
     return () => clearInterval(interval);
-  }, [gameState.status, gameState.level, showRewardModal]);
+  }, [gameState.status, gameState.level]);
 
   const spawnObstacle = useCallback((level: GameLevel) => {
     const lane = Math.floor(Math.random() * 3) as Lane;
@@ -251,12 +195,6 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
           setGameState(s => ({ ...s, levelTransition: true, level: 'OMEGA.A', speed: LEVEL_CONFIG['OMEGA.A'].baseSpeed }));
           setTimeout(() => {
             setGameState(s => ({ ...s, levelTransition: false }));
-            if (!hasShownRewardRef.current) {
-              setTimeout(() => {
-                setShowRewardModal(true);
-                hasShownRewardRef.current = true;
-              }, 500);
-            }
           }, 1500);
         }, 0);
       }
@@ -301,8 +239,7 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
 
   const startGame = useCallback((gender: Gender) => {
     hasTransitionedRef.current = false;
-    hasShownRewardRef.current = false;
-    setShowRewardModal(false);
+    setTrialCompleted(false);
     setPlayer({ lane: 1, isDucking: false, gender, y: 0 });
     setObstacles([]);
     setGameState(prev => ({
@@ -319,21 +256,21 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
   }, []);
 
   const movePlayer = useCallback((direction: 'left' | 'right') => {
-    if (gameState.status !== 'playing' || showRewardModal) return;
+    if (gameState.status !== 'playing') return;
     setPlayer(prev => {
       const newLane = direction === 'left' ? Math.max(0, prev.lane - 1) : Math.min(2, prev.lane + 1);
       return { ...prev, lane: newLane as Lane };
     });
-  }, [gameState.status, showRewardModal]);
+  }, [gameState.status]);
 
   const duck = useCallback(() => {
-    if (gameState.status !== 'playing' || showRewardModal) return;
+    if (gameState.status !== 'playing') return;
     if (duckTimeoutRef.current) clearTimeout(duckTimeoutRef.current);
     setPlayer(prev => ({ ...prev, isDucking: true }));
     duckTimeoutRef.current = setTimeout(() => {
       setPlayer(prev => ({ ...prev, isDucking: false }));
     }, DUCK_DURATION);
-  }, [gameState.status, showRewardModal]);
+  }, [gameState.status]);
 
   // Keyboard controls
   useEffect(() => {
@@ -476,8 +413,6 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
           className="relative w-full h-full"
           style={{ 
             background: bgGradient,
-            filter: showRewardModal ? 'blur(2px) brightness(0.7)' : 'none',
-            transition: 'filter 0.3s ease',
           }}
         >
           {/* Level Transition */}
@@ -674,11 +609,8 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
         </div>
       )}
 
-      {/* Reward Modal */}
-      <RewardModal isOpen={showRewardModal} onClose={() => setShowRewardModal(false)} />
-
       {/* Access Realm Button - appears after reaching 7000 points */}
-      {trialCompleted && !showRewardModal && gameState.status !== 'gameOver' && (
+      {trialCompleted && gameState.status !== 'gameOver' && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150]">
           <button
             onClick={onTrialComplete}
