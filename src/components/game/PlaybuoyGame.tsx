@@ -114,6 +114,18 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
 
   const [animationTick, setAnimationTick] = useState(0);
   const [trialCompleted, setTrialCompleted] = useState(false);
+  const [accessButtonClicked, setAccessButtonClicked] = useState(false);
+  const [accessCode, setAccessCode] = useState<string | null>(null);
+
+  // Generate access code when trial is completed
+  const generateAccessCode = useCallback(() => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = 'OMEGA-';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }, []);
 
   const animationRef = useRef<number>();
   const lastSpawnRef = useRef<number>(0);
@@ -191,6 +203,7 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
       if (prev.level === 'OMEGA' && newScore >= LEVEL_UNLOCK_SCORE && !hasTransitionedRef.current) {
         hasTransitionedRef.current = true;
         setTrialCompleted(true);
+        setAccessCode(generateAccessCode());
         setTimeout(() => {
           setGameState(s => ({ ...s, levelTransition: true, level: 'OMEGA.A', speed: LEVEL_CONFIG['OMEGA.A'].baseSpeed }));
           setTimeout(() => {
@@ -609,11 +622,14 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
         </div>
       )}
 
-      {/* Access Realm Button - appears after reaching 7000 points */}
-      {trialCompleted && gameState.status !== 'gameOver' && (
+      {/* Access Realm Button - appears after reaching 7000 points, disappears on click */}
+      {trialCompleted && gameState.status !== 'gameOver' && !accessButtonClicked && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150]">
           <button
-            onClick={onTrialComplete}
+            onClick={() => {
+              setAccessButtonClicked(true);
+              onTrialComplete?.();
+            }}
             className="px-8 py-4 font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
             style={{
               background: 'linear-gradient(135deg, #00ffff 0%, #ff00ff 50%, #00ffff 100%)',
