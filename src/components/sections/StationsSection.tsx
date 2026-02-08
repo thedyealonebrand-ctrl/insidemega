@@ -149,13 +149,32 @@ function ShuffleStation() {
           <div className="inline-flex items-center gap-2 px-4 py-1 bg-primary/10 rounded-full mb-4">
             <Shuffle className="w-4 h-4 text-primary" />
             <span className="font-body text-sm uppercase tracking-wider text-muted-foreground">
-              Broadcast Control
+              Curated Performance Broadcast
             </span>
           </div>
           
           <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-cyan mb-6">
             THE SHUFFLE STATION
           </h3>
+          
+          {/* Description */}
+          <div className="max-w-2xl mx-auto mb-8 space-y-4">
+            <p className="font-body text-muted-foreground leading-relaxed">
+              THE SHUFFLE is a curated performance broadcast where selected artists premiere music inside the OMEGA ecosystem.
+            </p>
+            <p className="font-body text-muted-foreground leading-relaxed">
+              Each episode features <span className="text-primary font-semibold">7 artists</span> performing <span className="text-primary font-semibold">3 songs each</span>, streamed as a show aired live on Discord — blending digital stage presence, community energy, and on-chain culture.
+            </p>
+            <p className="font-display text-secondary text-glow-purple text-xl mt-6">
+              COMING THIS MARCH 2026
+            </p>
+            <div className="p-4 bg-muted/20 rounded-lg border border-primary/20 mt-4">
+              <p className="font-mono text-primary text-sm italic">
+                It's not just a concert.<br />
+                <span className="text-foreground">It's a signal drop inside the Realm.</span>
+              </p>
+            </div>
+          </div>
           
           {/* Broadcast control visualization */}
           <div className="max-w-md mx-auto mb-8">
@@ -176,7 +195,7 @@ function ShuffleStation() {
           
           <GlowButton variant="primary">
             <Shuffle className="w-4 h-4 mr-2" />
-            Shuffle The Frequencies
+            Get Notified
           </GlowButton>
         </div>
       </HolographicPanel>
