@@ -79,7 +79,7 @@ const PROSPECT_EMOJIS = {
 
 // Main Game Component
 interface PlaybuoyGameProps {
-  onTrialComplete?: () => void;
+  onTrialComplete?: (accessCode: string) => void;
 }
 
 export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
@@ -623,12 +623,12 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
       )}
 
       {/* Access Realm Button - appears after reaching 7000 points, disappears on click */}
-      {trialCompleted && gameState.status !== 'gameOver' && !accessButtonClicked && (
+      {trialCompleted && gameState.status !== 'gameOver' && !accessButtonClicked && accessCode && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150]">
           <button
             onClick={() => {
               setAccessButtonClicked(true);
-              onTrialComplete?.();
+              onTrialComplete?.(accessCode);
             }}
             className="px-8 py-4 font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
             style={{
