@@ -1,17 +1,51 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { HolographicPanel } from "@/components/ui/HolographicPanel";
 import { HoloInput } from "@/components/ui/HoloInput";
 import { GlowButton } from "@/components/ui/GlowButton";
-import { Lock, Key, ShieldCheck, AlertTriangle, Unlock } from "lucide-react";
+import { Lock, Key, ShieldCheck, AlertTriangle, Unlock, Sparkles, Copy, Check } from "lucide-react";
 
 interface AccessGateSectionProps {
   isUnlocked?: boolean;
+  generatedCode?: string | null;
   onAccessGranted?: () => void;
 }
 
-export function AccessGateSection({ isUnlocked = false, onAccessGranted }: AccessGateSectionProps) {
+export function AccessGateSection({ isUnlocked = false, generatedCode = null, onAccessGranted }: AccessGateSectionProps) {
   const [code, setCode] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [displayedCode, setDisplayedCode] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const generateNewCode = useCallback(() => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let newCode = 'OMEGA-';
+    for (let i = 0; i < 6; i++) {
+      newCode += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return newCode;
+  }, []);
+
+  const handleGenerateCode = () => {
+    if (!isUnlocked) return;
+    setIsGenerating(true);
+    
+    // Simulate code generation with animation
+    setTimeout(() => {
+      const newCode = generatedCode || generateNewCode();
+      setDisplayedCode(newCode);
+      setCode(newCode);
+      setIsGenerating(false);
+    }, 1000);
+  };
+
+  const handleCopyCode = () => {
+    if (displayedCode) {
+      navigator.clipboard.writeText(displayedCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,9 +53,9 @@ export function AccessGateSection({ isUnlocked = false, onAccessGranted }: Acces
     
     setStatus("loading");
     
-    // Simulate verification
+    // Verify the code
     setTimeout(() => {
-      if (code.toLowerCase() === "omega" || code.length >= 4) {
+      if (code === displayedCode || code.toLowerCase() === "omega" || code.length >= 4) {
         setStatus("success");
         onAccessGranted?.();
       } else {
@@ -89,35 +123,84 @@ export function AccessGateSection({ isUnlocked = false, onAccessGranted }: Acces
         {/* Form */}
         {status !== "success" ? (
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Generate Code Button */}
+            {isUnlocked && !displayedCode && (
+              <div className="text-center">
+                <GlowButton
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                  onClick={handleGenerateCode}
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      Generating...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5" />
+                      Generate Access Code
+                    </span>
+                  )}
+                </GlowButton>
+              </div>
+            )}
+
+            {/* Display Generated Code */}
+            {displayedCode && (
+              <div className="p-4 bg-primary/10 border border-primary/40 rounded-lg">
+                <p className="font-body text-sm text-muted-foreground mb-2 text-center">Your Access Code:</p>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="font-display text-2xl text-primary text-glow-cyan tracking-wider">
+                    {displayedCode}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyCode}
+                    className="p-2 hover:bg-primary/20 rounded-md transition-colors"
+                  >
+                    {copied ? (
+                      <Check className="w-5 h-5 text-green-400" />
+                    ) : (
+                      <Copy className="w-5 h-5 text-primary" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+
             <HoloInput
               type="text"
-              placeholder={isUnlocked ? "Enter access code..." : "Complete the trial first..."}
+              placeholder={isUnlocked ? (displayedCode ? "Enter your access code..." : "Generate a code first...") : "Complete the trial first..."}
               value={code}
               onChange={(e) => {
                 setCode(e.target.value);
                 if (status === "error") setStatus("idle");
               }}
               icon={<Key className="w-5 h-5" />}
-              disabled={!isUnlocked}
+              disabled={!isUnlocked || !displayedCode}
               className={`
                 ${status === "error" ? "border-destructive/50" : ""}
-                ${!isUnlocked ? "opacity-50 cursor-not-allowed" : ""}
+                ${(!isUnlocked || !displayedCode) ? "opacity-50 cursor-not-allowed" : ""}
               `}
             />
             
             <GlowButton
               type="submit"
-              variant={isUnlocked ? "primary" : "secondary"}
+              variant={isUnlocked && displayedCode ? "primary" : "secondary"}
               size="lg"
               className="w-full"
-              disabled={!code || status === "loading" || !isUnlocked}
+              disabled={!code || status === "loading" || !isUnlocked || !displayedCode}
             >
               {status === "loading" ? (
                 <span className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   Verifying...
                 </span>
-              ) : isUnlocked ? (
+              ) : isUnlocked && displayedCode ? (
                 "Enter Our Many Endless Great Adventures"
               ) : (
                 "Complete Trial to Unlock"

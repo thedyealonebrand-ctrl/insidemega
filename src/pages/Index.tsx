@@ -8,6 +8,7 @@ import { StationsSection } from "@/components/sections/StationsSection";
 const Index = () => {
   const [trialComplete, setTrialComplete] = useState(false);
   const [accessGranted, setAccessGranted] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState<string | null>(null);
   
   const trialRef = useRef<HTMLDivElement>(null);
   const accessRef = useRef<HTMLDivElement>(null);
@@ -25,12 +26,13 @@ const Index = () => {
     stationsRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleTrialComplete = () => {
+  const handleTrialComplete = (accessCode: string) => {
     setTrialComplete(true);
-    // Auto scroll to access gate after a delay
+    setGeneratedCode(accessCode);
+    // Auto scroll to access gate immediately
     setTimeout(() => {
       scrollToAccess();
-    }, 2000);
+    }, 500);
   };
 
   const handleAccessGranted = () => {
@@ -73,6 +75,7 @@ const Index = () => {
         <div ref={accessRef}>
           <AccessGateSection 
             isUnlocked={trialComplete}
+            generatedCode={generatedCode}
             onAccessGranted={handleAccessGranted}
           />
         </div>
