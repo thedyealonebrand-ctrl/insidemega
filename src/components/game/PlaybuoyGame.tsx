@@ -199,11 +199,16 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
       const newSpeed = Math.min(prev.speed + config.speedIncrement, config.maxSpeed);
       const newScore = prev.score + Math.floor(newSpeed * 10);
 
-      // Check for level transition
+      // Check for level transition - auto grant access when reaching 7000
       if (prev.level === 'OMEGA' && newScore >= LEVEL_UNLOCK_SCORE && !hasTransitionedRef.current) {
         hasTransitionedRef.current = true;
         setTrialCompleted(true);
-        setAccessCode(generateAccessCode());
+        const code = generateAccessCode();
+        setAccessCode(code);
+        // Automatically trigger access callback
+        setTimeout(() => {
+          onTrialComplete?.(code);
+        }, 1500);
         setTimeout(() => {
           setGameState(s => ({ ...s, levelTransition: true, level: 'OMEGA.A', speed: LEVEL_CONFIG['OMEGA.A'].baseSpeed }));
           setTimeout(() => {
@@ -622,26 +627,22 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
         </div>
       )}
 
-      {/* Access Realm Button - appears after reaching 7000 points, disappears on click */}
-      {trialCompleted && gameState.status !== 'gameOver' && !accessButtonClicked && accessCode && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150]">
-          <button
-            onClick={() => {
-              setAccessButtonClicked(true);
-              onTrialComplete?.(accessCode);
-            }}
-            className="px-8 py-4 font-bold text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
+      {/* Access notification - appears briefly when 7000 points reached */}
+      {trialCompleted && gameState.status !== 'gameOver' && !accessButtonClicked && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] pointer-events-none">
+          <div 
+            className="px-8 py-4 font-bold text-lg rounded-xl"
             style={{
               background: 'linear-gradient(135deg, #00ffff 0%, #ff00ff 50%, #00ffff 100%)',
               backgroundSize: '200% 200%',
-              animation: 'gradientShift 3s ease infinite',
+              animation: 'gradientShift 3s ease infinite, fadeOut 1.5s ease forwards',
               boxShadow: '0 0 30px rgba(0,255,255,0.6), 0 0 60px rgba(255,0,255,0.4)',
               color: 'white',
               textShadow: '0 0 10px rgba(0,0,0,0.5)',
             }}
           >
-            ⚡ ACCESS THE REALM ⚡
-          </button>
+            ⚡ ACCESS GRANTED ⚡
+          </div>
         </div>
       )}
 
@@ -701,6 +702,10 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
+        }
+        @keyframes fadeOut {
+          0% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-20px); }
         }
       `}</style>
     </div>
