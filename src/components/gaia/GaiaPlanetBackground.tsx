@@ -2,6 +2,7 @@ import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Points, PointMaterial, Float } from "@react-three/drei";
 import * as THREE from "three";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 /* ── Starfield ── */
 function GaiaStarField({ count = 4000 }) {
@@ -121,17 +122,14 @@ function GaiaPlanet() {
 
   return (
     <group position={[0, -18, -30]}>
-      {/* Planet body */}
       <mesh ref={meshRef}>
         <sphereGeometry args={[14, 64, 64]} />
         <meshStandardMaterial color="#1a7a5c" emissive="#0d503a" emissiveIntensity={0.4} roughness={0.7} metalness={0.2} />
       </mesh>
-      {/* Atmospheric glow */}
       <mesh ref={glowRef}>
         <sphereGeometry args={[14.5, 64, 64]} />
         <meshBasicMaterial color="#60d9b4" transparent opacity={0.08} blending={THREE.AdditiveBlending} />
       </mesh>
-      {/* Outer atmosphere ring */}
       <mesh>
         <sphereGeometry args={[15.5, 64, 64]} />
         <meshBasicMaterial color="#93e8c8" transparent opacity={0.03} blending={THREE.AdditiveBlending} />
@@ -152,10 +150,13 @@ function GaiaCameraRig() {
 
 /* ── Main export ── */
 export default function GaiaPlanetBackground() {
+  const isMobile = useIsMobile();
+
   return (
     <div className="fixed inset-0 z-0">
       <Canvas
         camera={{ position: [0, 2, 30], fov: 70 }}
+        dpr={isMobile ? 1 : [1, 2]}
         style={{
           background: "linear-gradient(180deg, #020a14 0%, #041a2e 30%, #082a3a 60%, #0a1f28 100%)",
         }}
@@ -165,16 +166,20 @@ export default function GaiaPlanetBackground() {
         <pointLight position={[-15, 10, -20]} intensity={0.2} color="#3b82f6" />
 
         <GaiaCameraRig />
-        <GaiaStarField count={5000} />
-        <BioParticles count={250} />
+        <GaiaStarField count={isMobile ? 2000 : 5000} />
+        <BioParticles count={isMobile ? 80 : 250} />
         <GaiaPlanet />
 
-        {/* Aurora layers */}
+        {/* Aurora layers — fewer on mobile */}
         <AuroraLayer position={[-25, 15, -40]} color="#34d399" scale={1.4} speed={0.25} />
         <AuroraLayer position={[20, 20, -45]} color="#60a5fa" scale={1.1} speed={0.35} />
-        <AuroraLayer position={[0, 25, -50]} color="#38bdf8" scale={1.6} speed={0.2} />
-        <AuroraLayer position={[-15, -10, -35]} color="#2dd4bf" scale={0.9} speed={0.4} />
-        <AuroraLayer position={[30, 5, -55]} color="#a78bfa" scale={1.2} speed={0.15} />
+        {!isMobile && (
+          <>
+            <AuroraLayer position={[0, 25, -50]} color="#38bdf8" scale={1.6} speed={0.2} />
+            <AuroraLayer position={[-15, -10, -35]} color="#2dd4bf" scale={0.9} speed={0.4} />
+            <AuroraLayer position={[30, 5, -55]} color="#a78bfa" scale={1.2} speed={0.15} />
+          </>
+        )}
       </Canvas>
     </div>
   );

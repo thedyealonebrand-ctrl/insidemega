@@ -11,8 +11,8 @@ export function HeroSection({ onBeginTrial, onHowItWorks }: HeroSectionProps) {
   return (
     <section className="min-h-screen flex flex-col items-center justify-center px-4 py-20 relative">
       {/* Light flare effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl light-flare" />
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-secondary/10 rounded-full blur-3xl light-flare" style={{ animationDelay: "2s" }} />
+      <div className="absolute top-1/4 left-1/4 w-48 sm:w-96 h-48 sm:h-96 bg-primary/10 rounded-full blur-3xl light-flare" />
+      <div className="absolute bottom-1/4 right-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-secondary/10 rounded-full blur-3xl light-flare" style={{ animationDelay: "2s" }} />
       
       {/* Status badge */}
       <div className="animate-reveal mb-8">
@@ -26,8 +26,8 @@ export function HeroSection({ onBeginTrial, onHowItWorks }: HeroSectionProps) {
 
       {/* Main Title */}
       <div className="animate-reveal-delay-1 text-center perspective-1000 mb-8">
-        <h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-tight tracking-wider">
-          <span className="block text-muted-foreground mb-2">ENTER</span>
+        <h1 className="font-display text-3xl sm:text-6xl md:text-7xl lg:text-8xl leading-tight tracking-wider">
+          <span className="block text-muted-foreground mb-2 text-lg sm:text-4xl md:text-5xl lg:text-6xl">ENTER</span>
           <span className="block text-glow-cyan">
             <span className="text-primary">O</span>
             <span className="text-foreground">.</span>
@@ -38,7 +38,7 @@ export function HeroSection({ onBeginTrial, onHowItWorks }: HeroSectionProps) {
             <span className="text-primary">G</span>
             <span className="text-foreground">.</span>
             <span className="text-primary">A</span>
-            <span className="text-foreground mx-4">REALM</span>
+            <span className="text-foreground mx-2 sm:mx-4">REALM</span>
           </span>
         </h1>
       </div>

@@ -132,7 +132,7 @@ export function AccessGateSection({ isUnlocked = false, generatedCode = null, on
             )}
           </div>
           
-          <h2 className="font-display text-4xl sm:text-5xl text-foreground text-glow-cyan mb-2">
+          <h2 className="font-display text-3xl sm:text-5xl text-foreground text-glow-cyan mb-2">
             ACCESS GATE
           </h2>
           
@@ -158,7 +158,7 @@ export function AccessGateSection({ isUnlocked = false, generatedCode = null, on
                   To generate your access code, follow <span className="text-primary font-semibold">7ROO7H BASED</span> on X and Instagram
                 </p>
                 
-                <div className="flex justify-center gap-4">
+                <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
                   {/* X (Twitter) Follow Button */}
                   <button
                     type="button"
