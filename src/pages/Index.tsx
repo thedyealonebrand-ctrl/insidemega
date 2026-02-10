@@ -56,7 +56,7 @@ const Index = () => {
       <div className="fixed inset-0 bg-gradient-radial from-transparent via-transparent to-background pointer-events-none z-10" />
 
       {/* Light flare effect */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none z-10 light-flare" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none z-10 light-flare" />
 
       {/* Main Content */}
       <main className="relative z-20">

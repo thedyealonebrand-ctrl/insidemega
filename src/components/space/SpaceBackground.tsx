@@ -2,6 +2,7 @@ import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Points, PointMaterial, Float } from "@react-three/drei";
 import * as THREE from "three";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function StarField({ count = 5000 }) {
   const ref = useRef<THREE.Points>(null);
@@ -178,22 +179,29 @@ function CameraRig() {
 }
 
 export default function SpaceBackground() {
+  const isMobile = useIsMobile();
+
   return (
     <div className="fixed inset-0 z-0">
       <Canvas
         camera={{ position: [0, 0, 30], fov: 75 }}
+        dpr={isMobile ? 1 : [1, 2]}
         style={{ background: "linear-gradient(180deg, #030712 0%, #0a0a1a 50%, #030712 100%)" }}
       >
         <ambientLight intensity={0.1} />
         <CameraRig />
-        <StarField count={6000} />
-        <DistantStars count={4000} />
-        <FloatingParticles count={150} />
+        <StarField count={isMobile ? 2000 : 6000} />
+        <DistantStars count={isMobile ? 1500 : 4000} />
+        <FloatingParticles count={isMobile ? 50 : 150} />
         <Nebula />
         <NebulaCloud position={[-30, 20, -40]} color="#8b5cf6" scale={1.2} />
         <NebulaCloud position={[25, -15, -35]} color="#06b6d4" scale={0.8} />
-        <NebulaCloud position={[0, 30, -45]} color="#ec4899" scale={1} />
-        <NebulaCloud position={[-20, -25, -50]} color="#3b82f6" scale={1.5} />
+        {!isMobile && (
+          <>
+            <NebulaCloud position={[0, 30, -45]} color="#ec4899" scale={1} />
+            <NebulaCloud position={[-20, -25, -50]} color="#3b82f6" scale={1.5} />
+          </>
+        )}
       </Canvas>
     </div>
   );

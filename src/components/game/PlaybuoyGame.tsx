@@ -409,17 +409,17 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
             className="w-72 max-w-[70vw] mb-4"
             style={{ filter: 'drop-shadow(0 0 20px rgba(0, 255, 255, 0.5))' }}
           />
-          <p className="text-xl text-white/80 mb-8">Avoid Heartbreak, Stay Single!</p>
-          <div className="flex gap-4 flex-wrap justify-center">
-            <button onClick={() => startGame('male')} className="px-8 py-4 bg-cyan-500 hover:bg-cyan-400 text-white font-bold rounded-xl text-lg transition-all hover:scale-105">
+          <p className="text-lg sm:text-xl text-white/80 mb-6 sm:mb-8 px-4">Avoid Heartbreak, Stay Single!</p>
+          <div className="flex gap-3 sm:gap-4 flex-wrap justify-center px-4">
+            <button onClick={() => startGame('male')} className="px-6 sm:px-8 py-3 sm:py-4 bg-cyan-500 hover:bg-cyan-400 text-white font-bold rounded-xl text-base sm:text-lg transition-all hover:scale-105">
               🏃‍♂️ ADAM'S SON
             </button>
-            <button onClick={() => startGame('female')} className="px-8 py-4 bg-pink-500 hover:bg-pink-400 text-white font-bold rounded-xl text-lg transition-all hover:scale-105">
+            <button onClick={() => startGame('female')} className="px-6 sm:px-8 py-3 sm:py-4 bg-pink-500 hover:bg-pink-400 text-white font-bold rounded-xl text-base sm:text-lg transition-all hover:scale-105">
               🏃‍♀️ EVE'S DAUGHTER
             </button>
           </div>
-          <div className="mt-8 text-white/60">
-            <p>Use Arrow Keys or Swipe: ← → to move, ↓ or Space to duck</p>
+          <div className="mt-6 sm:mt-8 text-white/60 px-4 text-sm sm:text-base">
+            <p>Swipe ← → to move, ↓ to duck</p>
             <p className="mt-2">High Score: {gameState.highScore}</p>
           </div>
         </div>
@@ -587,13 +587,13 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
           </div>
 
           {/* HUD */}
-          <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-50 text-white">
+          <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 flex justify-between items-start z-50 text-white">
             <div>
-              <p className="text-3xl font-bold" style={{ textShadow: '0 0 10px rgba(0,0,0,0.8)' }}>{gameState.score}</p>
-              <p className="text-sm opacity-80">Score</p>
+              <p className="text-xl sm:text-3xl font-bold" style={{ textShadow: '0 0 10px rgba(0,0,0,0.8)' }}>{gameState.score}</p>
+              <p className="text-xs opacity-80">Score</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold" style={{ 
+              <p className="text-lg sm:text-2xl font-bold" style={{ 
                 color: isOmegaA ? '#ffd700' : '#00ffff',
                 textShadow: `0 0 20px ${isOmegaA ? 'rgba(255,215,0,0.8)' : 'rgba(0,255,255,0.8)'}`,
               }}>
@@ -602,8 +602,8 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
               <p className="text-xs opacity-80">Level</p>
             </div>
             <div className="text-right">
-              <p className="text-xl font-bold" style={{ textShadow: '0 0 10px rgba(0,0,0,0.8)' }}>x{gameState.speed.toFixed(1)}</p>
-              <p className="text-sm opacity-80">Speed</p>
+              <p className="text-base sm:text-xl font-bold" style={{ textShadow: '0 0 10px rgba(0,0,0,0.8)' }}>x{gameState.speed.toFixed(1)}</p>
+              <p className="text-xs opacity-80">Speed</p>
             </div>
           </div>
         </div>
@@ -612,12 +612,12 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
       {/* Game Over */}
       {gameState.status === 'gameOver' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90">
-          <h2 className="text-6xl font-bold text-red-500 mb-4" style={{ textShadow: '0 0 40px rgba(255,0,0,0.8)' }}>
+          <h2 className="text-4xl sm:text-6xl font-bold text-red-500 mb-4" style={{ textShadow: '0 0 40px rgba(255,0,0,0.8)' }}>
             GAME OVER
           </h2>
-          <p className="text-3xl text-white mb-2">💔 Heartbroken!</p>
-          <p className="text-2xl text-white/80 mb-8">Score: {gameState.score}</p>
-          <p className="text-xl text-white/60 mb-8">High Score: {gameState.highScore}</p>
+          <p className="text-2xl sm:text-3xl text-white mb-2">💔 Heartbroken!</p>
+          <p className="text-xl sm:text-2xl text-white/80 mb-6 sm:mb-8">Score: {gameState.score}</p>
+          <p className="text-lg sm:text-xl text-white/60 mb-6 sm:mb-8">High Score: {gameState.highScore}</p>
           <button 
             onClick={() => setGameState(prev => ({ ...prev, status: 'menu', isColliding: false }))}
             className="px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-xl text-lg transition-all hover:scale-105"

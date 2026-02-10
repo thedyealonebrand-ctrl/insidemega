@@ -23,7 +23,7 @@ function VolumesStation() {
             Audio Archives
           </span>
         </div>
-        <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-cyan">
+        <h3 className="font-display text-2xl sm:text-4xl text-foreground text-glow-cyan">
           OMEGA VOLUMES STATION
         </h3>
       </div>
@@ -82,7 +82,7 @@ function HiddenSignalStation() {
       <HolographicPanel variant="purple" className="text-center">
         <div className="flex flex-col items-center">
           {/* Signal Icon */}
-          <div className="relative w-48 h-48 mb-6">
+          <div className="relative w-32 sm:w-48 h-32 sm:h-48 mb-6">
             <img 
               src={signalIcon} 
               alt="Hidden Signal" 
@@ -101,7 +101,7 @@ function HiddenSignalStation() {
             </span>
           </div>
           
-          <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-purple mb-6">
+          <h3 className="font-display text-2xl sm:text-4xl text-foreground text-glow-purple mb-6">
             HIDDEN SIGNAL STATION
           </h3>
           
@@ -135,7 +135,7 @@ function ShuffleStation() {
       <HolographicPanel className="text-center">
         <div className="flex flex-col items-center">
           {/* Shuffle Icon */}
-          <div className="relative w-48 h-48 mb-6">
+          <div className="relative w-32 sm:w-48 h-32 sm:h-48 mb-6">
             <img 
               src={shuffleIcon} 
               alt="Shuffle Pass" 
@@ -154,7 +154,7 @@ function ShuffleStation() {
             </span>
           </div>
           
-          <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-cyan mb-6">
+          <h3 className="font-display text-2xl sm:text-4xl text-foreground text-glow-cyan mb-6">
             THE SHUFFLE STATION
           </h3>
           
@@ -210,7 +210,7 @@ function DyeAloneStation() {
       <HolographicPanel variant="blue" className="text-center">
         <div className="flex flex-col items-center">
           {/* Livingstoner Icon */}
-          <div className="relative w-48 h-48 mb-6">
+          <div className="relative w-32 sm:w-48 h-32 sm:h-48 mb-6">
             <img 
               src={livingstonerIcon} 
               alt="Livingstoner Collectable" 
@@ -229,7 +229,7 @@ function DyeAloneStation() {
             </span>
           </div>
           
-          <h3 className="font-display text-3xl sm:text-4xl text-foreground text-glow-blue mb-6">
+          <h3 className="font-display text-2xl sm:text-4xl text-foreground text-glow-blue mb-6">
             DYE ALONE STATION
           </h3>
           
@@ -290,7 +290,7 @@ export function StationsSection() {
       <div className="max-w-6xl mx-auto">
         {/* Section header */}
         <div className="text-center mb-16">
-          <h2 className="font-display text-5xl sm:text-6xl text-foreground mb-4">
+          <h2 className="font-display text-3xl sm:text-5xl md:text-6xl text-foreground mb-4">
             INSIDE THE <span className="text-primary text-glow-cyan">REALM</span>
           </h2>
           <p className="font-body text-xl text-muted-foreground max-w-2xl mx-auto">
