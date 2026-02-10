@@ -1,6 +1,7 @@
 import { HolographicPanel, HolographicCard } from "@/components/ui/HolographicPanel";
 import { GlowButton } from "@/components/ui/GlowButton";
-import { Disc3, Radio, Shuffle, Shirt, ExternalLink, Play, Music } from "lucide-react";
+import { Disc3, Radio, Shuffle, Shirt, ExternalLink, Play, Music, Globe } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import signalIcon from "@/assets/signal-abde.png";
 import livingstonerIcon from "@/assets/livingstoner-collectable.png";
 import shuffleIcon from "@/assets/shuffle-pass.png";
@@ -246,6 +247,43 @@ function DyeAloneStation() {
   );
 }
 
+function GaiaPortal() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="mt-20">
+      <HolographicPanel className="text-center">
+        <div className="flex flex-col items-center">
+          <div className="relative w-24 h-24 mb-6">
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: "radial-gradient(circle, rgba(52,211,153,0.4) 0%, rgba(96,165,250,0.2) 50%, transparent 70%)",
+                animation: "pulse 3s ease-in-out infinite",
+              }}
+            />
+            <div className="absolute inset-2 rounded-full bg-gradient-to-br from-emerald-500/30 to-sky-500/20 flex items-center justify-center border border-emerald-400/30">
+              <Globe className="w-10 h-10 text-emerald-400" />
+            </div>
+          </div>
+
+          <h3 className="font-display text-3xl sm:text-4xl text-foreground mb-3" style={{ textShadow: "0 0 30px rgba(52,211,153,0.4)" }}>
+            ENTER GAIA-1
+          </h3>
+          <p className="font-body text-muted-foreground mb-8 max-w-md mx-auto">
+            The first living planet in the OMEGA REALM awaits. Begin your journey as a citizen of GAIA-1.
+          </p>
+
+          <GlowButton variant="primary" onClick={() => navigate("/gaia")}>
+            <Globe className="w-4 h-4 mr-2" />
+            Land on GAIA-1
+          </GlowButton>
+        </div>
+      </HolographicPanel>
+    </div>
+  );
+}
+
 export function StationsSection() {
   return (
     <section id="stations" className="min-h-screen px-4 py-20">
@@ -264,6 +302,7 @@ export function StationsSection() {
         <HiddenSignalStation />
         <ShuffleStation />
         <DyeAloneStation />
+        <GaiaPortal />
       </div>
     </section>
   );
