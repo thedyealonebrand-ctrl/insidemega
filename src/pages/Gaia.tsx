@@ -2,19 +2,31 @@ import { useState, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import GaiaPlanetBackground from "@/components/gaia/GaiaPlanetBackground";
 import GaiaLanding from "@/components/gaia/GaiaLanding";
-import GaiaOnboarding from "@/components/gaia/GaiaOnboarding";
+import GaiaCitizenCreation from "@/components/gaia/GaiaCitizenCreation";
+import GaiaHub from "@/components/gaia/GaiaHub";
 
-type GaiaPhase = "landing" | "onboarding" | "hub";
+type GaiaPhase = "landing" | "citizen" | "beaming" | "hub";
+
+interface CitizenData {
+  name: string;
+  starSign: string;
+  talents: string[];
+  avatar: number;
+  passcode: string;
+}
 
 const Gaia = () => {
   const [phase, setPhase] = useState<GaiaPhase>("landing");
+  const [citizen, setCitizen] = useState<CitizenData | null>(null);
 
-  const handleLand = useCallback(() => setPhase("onboarding"), []);
-  const handleLearn = useCallback(() => {
-    // For now, scroll or show info — later can be a modal
-    setPhase("onboarding");
+  const handleLand = useCallback(() => setPhase("citizen"), []);
+  const handleLearn = useCallback(() => setPhase("citizen"), []);
+
+  const handleCitizenComplete = useCallback((data: CitizenData) => {
+    setCitizen(data);
+    setPhase("beaming");
+    setTimeout(() => setPhase("hub"), 2800);
   }, []);
-  const handleOnboardingComplete = useCallback(() => setPhase("hub"), []);
 
   return (
     <>
@@ -38,20 +50,50 @@ const Gaia = () => {
         {/* Scanlines */}
         <div className="fixed inset-0 pointer-events-none z-10 opacity-15 scanlines" />
 
+        {/* Beam-down transition */}
+        {phase === "beaming" && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="text-center animate-beam-sequence">
+              {/* Beam column */}
+              <div
+                className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-1"
+                style={{
+                  background: "linear-gradient(180deg, hsl(160 84% 50%), transparent)",
+                  boxShadow: "0 0 40px 15px hsl(160 84% 50% / 0.3), 0 0 80px 30px hsl(160 84% 50% / 0.15)",
+                  animation: "beamDown 1.2s ease-out forwards",
+                }}
+              />
+              {/* Flash */}
+              <div
+                className="fixed inset-0"
+                style={{
+                  background: "hsl(160 84% 80%)",
+                  animation: "beamFlash 2.8s ease-out forwards",
+                }}
+              />
+              {/* Text */}
+              <p
+                className="relative font-display text-lg sm:text-2xl tracking-[0.3em] uppercase"
+                style={{
+                  color: "hsl(160 84% 70%)",
+                  textShadow: "0 0 30px hsl(160 84% 50% / 0.6)",
+                  animation: "beamText 2.8s ease-out forwards",
+                }}
+              >
+                Beaming Down to GAIA-1
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Content */}
         <main className="relative z-20">
           {phase === "landing" && <GaiaLanding onLand={handleLand} onLearn={handleLearn} />}
-          {phase === "onboarding" && <GaiaOnboarding onComplete={handleOnboardingComplete} />}
-          {phase === "hub" && (
-            <div className="min-h-screen flex items-center justify-center">
-              <p className="font-display text-2xl text-emerald-400 text-center">
-                GAIA-1 Hub — Coming in Phase 2
-              </p>
-            </div>
-          )}
+          {phase === "citizen" && <GaiaCitizenCreation onComplete={handleCitizenComplete} />}
+          {phase === "hub" && citizen && <GaiaHub citizen={citizen} />}
         </main>
 
-        {/* Corner accents — emerald themed */}
+        {/* Corner accents */}
         <div className="fixed top-0 left-0 w-24 h-24 pointer-events-none z-30">
           <div className="absolute top-4 left-4 w-full h-full border-l-2 border-t-2 border-emerald-500/30" />
           <div className="absolute top-2 left-2 w-3 h-3 bg-emerald-400/50 rounded-full blur-sm" />
@@ -69,6 +111,27 @@ const Gaia = () => {
           <div className="absolute bottom-2 right-2 w-3 h-3 bg-sky-400/50 rounded-full blur-sm" />
         </div>
       </div>
+
+      {/* Beam-down keyframes */}
+      <style>{`
+        @keyframes beamDown {
+          0% { opacity: 0; transform: translateX(-50%) scaleY(0); transform-origin: top; }
+          30% { opacity: 1; }
+          100% { opacity: 0; transform: translateX(-50%) scaleY(1); transform-origin: top; }
+        }
+        @keyframes beamFlash {
+          0%, 35% { opacity: 0; }
+          45% { opacity: 0.8; }
+          70% { opacity: 0; }
+          100% { opacity: 0; }
+        }
+        @keyframes beamText {
+          0% { opacity: 0; transform: translateY(20px); }
+          20% { opacity: 1; transform: translateY(0); }
+          70% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+      `}</style>
     </>
   );
 };
