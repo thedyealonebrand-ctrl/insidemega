@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 interface GaiaLandingProps {
   onLand: () => void;
   onLearn: () => void;
+  onReenter: () => void;
+  hasExistingCitizen: boolean;
 }
 
-export default function GaiaLanding({ onLand, onLearn }: GaiaLandingProps) {
+export default function GaiaLanding({ onLand, onLearn, onReenter, hasExistingCitizen }: GaiaLandingProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -101,6 +103,22 @@ export default function GaiaLanding({ onLand, onLearn }: GaiaLandingProps) {
             <span className="relative z-10">Land on GAIA-1</span>
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-sky-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           </button>
+
+          {hasExistingCitizen && (
+            <button
+              onClick={onReenter}
+              className="group relative px-10 py-4 font-display text-sm tracking-[0.2em] uppercase overflow-hidden rounded-lg transition-all duration-500 hover:scale-105"
+              style={{
+                background: "linear-gradient(135deg, rgba(167,139,250,0.15), rgba(236,72,153,0.15))",
+                border: "1px solid rgba(167,139,250,0.4)",
+                color: "#a78bfa",
+                boxShadow: "0 0 30px rgba(167,139,250,0.15), inset 0 0 30px rgba(167,139,250,0.05)",
+              }}
+            >
+              <span className="relative z-10">Re-Enter GAIA-1</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </button>
+          )}
 
           <button
             onClick={onLearn}

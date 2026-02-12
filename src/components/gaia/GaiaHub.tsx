@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { Radio, Tv, Brain, Users, Zap, Send, Heart, MessageSquare, Play } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Radio, Tv, Brain, Users, Zap, Send, MessageSquare, Play } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CitizenData {
+  id: string;
   name: string;
   starSign: string;
   talents: string[];
@@ -11,6 +13,26 @@ interface CitizenData {
 
 interface GaiaHubProps {
   citizen: CitizenData;
+}
+
+interface Signal {
+  id: string;
+  citizen_id: string;
+  content: string;
+  signal_type: string;
+  energy: number;
+  created_at: string;
+  citizen_name?: string;
+  citizen_avatar?: number;
+}
+
+interface CitizenRow {
+  id: string;
+  name: string;
+  star_sign: string;
+  talents: string[];
+  avatar: number;
+  created_at: string;
 }
 
 const AVATAR_STYLES = [
@@ -26,34 +48,6 @@ const AVATAR_STYLES = [
 
 type HubTab = "feed" | "broadcast" | "ideas" | "citizens";
 
-const MOCK_SIGNALS = [
-  { id: 1, author: "NOVA_7", avatar: 1, text: "Just discovered a new frequency in sector 9. The harmonics are unlike anything we've mapped before. 🔊", energy: 42, time: "2m ago" },
-  { id: 2, author: "CRYO.ART", avatar: 5, text: "New visual drop incoming. Rendered a full aurora sequence using on-chain generative code.", energy: 128, time: "8m ago", image: true },
-  { id: 3, author: "BASEDBUILDER", avatar: 2, text: "Shipped a new protocol for cross-planet identity verification. Citizens can now port their status across realms.", energy: 89, time: "15m ago" },
-  { id: 4, author: "STELLAR_X", avatar: 7, text: "Music session tonight in the Broadcast Zone. Ambient space beats. All citizens welcome. ✨", energy: 215, time: "22m ago" },
-  { id: 5, author: "DRIFTCODE", avatar: 3, text: "The idea exchange is evolving. We need more builders thinking about decentralized governance for GAIA-1.", energy: 67, time: "31m ago" },
-];
-
-const MOCK_BROADCASTS = [
-  { id: 1, title: "Cosmic Frequencies Vol. 3", author: "NOVA_7", type: "Music", energy: 340, live: true },
-  { id: 2, title: "Aurora Genesis — Generative Art", author: "CRYO.ART", type: "Visual", energy: 198, live: false },
-  { id: 3, title: "Building the Metachain", author: "BASEDBUILDER", type: "Talk", energy: 87, live: false },
-];
-
-const MOCK_IDEAS = [
-  { id: 1, title: "Cross-Planet Passport System", author: "DRIFTCODE", replies: 23, energy: 156, status: "active" },
-  { id: 2, title: "GAIA-1 Governance Framework", author: "STELLAR_X", replies: 45, energy: 289, status: "active" },
-  { id: 3, title: "Citizen Reputation Score", author: "NOVA_7", replies: 12, energy: 78, status: "draft" },
-];
-
-const MOCK_CITIZENS = [
-  { name: "NOVA_7", avatar: 1, sign: "Aquarius", talents: ["Music", "Production"], energy: 1240 },
-  { name: "CRYO.ART", avatar: 5, sign: "Pisces", talents: ["Art", "Design"], energy: 980 },
-  { name: "BASEDBUILDER", avatar: 2, sign: "Capricorn", talents: ["Coding", "Writing"], energy: 2100 },
-  { name: "STELLAR_X", avatar: 7, sign: "Leo", talents: ["Music", "Dance"], energy: 1560 },
-  { name: "DRIFTCODE", avatar: 3, sign: "Scorpio", talents: ["Coding", "Gaming"], energy: 870 },
-];
-
 const tabs: { key: HubTab; label: string; icon: typeof Radio }[] = [
   { key: "feed", label: "Signals", icon: Radio },
   { key: "broadcast", label: "Broadcast", icon: Tv },
@@ -61,24 +55,113 @@ const tabs: { key: HubTab; label: string; icon: typeof Radio }[] = [
   { key: "citizens", label: "Citizens", icon: Users },
 ];
 
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
 export default function GaiaHub({ citizen }: GaiaHubProps) {
   const [activeTab, setActiveTab] = useState<HubTab>("feed");
   const [signalText, setSignalText] = useState("");
-  const [energized, setEnergized] = useState<Set<number>>(new Set());
+  const [signals, setSignals] = useState<Signal[]>([]);
+  const [citizens, setCitizens] = useState<CitizenRow[]>([]);
+  const [energized, setEnergized] = useState<Set<string>>(new Set());
+  const [posting, setPosting] = useState(false);
 
-  const toggleEnergy = (id: number) => {
+  // Load signals with citizen info
+  const loadSignals = useCallback(async () => {
+    const { data: signalRows } = await supabase
+      .from("signals")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (!signalRows || signalRows.length === 0) {
+      setSignals([]);
+      return;
+    }
+
+    const citizenIds = [...new Set(signalRows.map((s: any) => s.citizen_id))];
+    const { data: citizenRows } = await supabase
+      .from("citizens")
+      .select("id, name, avatar")
+      .in("id", citizenIds);
+
+    const citizenMap = new Map((citizenRows || []).map((c: any) => [c.id, c]));
+
+    setSignals(
+      signalRows.map((s: any) => {
+        const c = citizenMap.get(s.citizen_id);
+        return {
+          ...s,
+          citizen_name: c?.name || "Unknown",
+          citizen_avatar: c?.avatar ?? 0,
+        };
+      })
+    );
+  }, []);
+
+  // Load citizens
+  const loadCitizens = useCallback(async () => {
+    const { data } = await supabase
+      .from("citizens")
+      .select("id, name, star_sign, talents, avatar, created_at")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (data) setCitizens(data as CitizenRow[]);
+  }, []);
+
+  useEffect(() => {
+    loadSignals();
+    loadCitizens();
+
+    // Realtime subscription for new signals
+    const channel = supabase
+      .channel("signals-feed")
+      .on("postgres_changes", { event: "*", schema: "public", table: "signals" }, () => {
+        loadSignals();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [loadSignals, loadCitizens]);
+
+  const postSignal = async () => {
+    if (!signalText.trim() || posting) return;
+    setPosting(true);
+    await supabase.from("signals").insert({
+      citizen_id: citizen.id,
+      content: signalText.trim(),
+      signal_type: "thought",
+    });
+    setSignalText("");
+    setPosting(false);
+    loadSignals();
+  };
+
+  const toggleEnergy = async (signalId: string, currentEnergy: number) => {
+    const wasEnergized = energized.has(signalId);
     setEnergized((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      wasEnergized ? next.delete(signalId) : next.add(signalId);
       return next;
     });
+    await supabase
+      .from("signals")
+      .update({ energy: currentEnergy + (wasEnergized ? -1 : 1) })
+      .eq("id", signalId);
   };
 
   const myAvatar = AVATAR_STYLES[citizen.avatar];
 
   return (
     <section className="min-h-screen pt-4 pb-24 px-3 sm:px-6">
-      {/* Top bar — citizen info */}
+      {/* Top bar */}
       <div className="flex items-center justify-between max-w-3xl mx-auto mb-4">
         <div className="flex items-center gap-3">
           <div
@@ -97,7 +180,9 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
           border: "1px solid hsl(50 80% 50% / 0.2)",
         }}>
           <Zap className="w-3 h-3 text-yellow-400" />
-          <span className="font-display text-[11px] text-yellow-400/80 tracking-wider">0</span>
+          <span className="font-display text-[11px] text-yellow-400/80 tracking-wider">
+            {signals.filter(s => s.citizen_id === citizen.id).reduce((sum, s) => sum + s.energy, 0)}
+          </span>
         </div>
       </div>
 
@@ -147,10 +232,12 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
                   className="flex-1 bg-transparent resize-none outline-none font-body text-sm text-sky-100/70 placeholder:text-sky-200/20"
                 />
               </div>
-              <div className="flex justify-end mt-2">
+              <div className="flex justify-between items-center mt-2">
+                <span className="font-body text-[10px] text-sky-200/20">{signalText.length}/280</span>
                 <button
+                  onClick={postSignal}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-display text-[10px] tracking-[0.15em] uppercase transition-all duration-300 hover:scale-105 disabled:opacity-30"
-                  disabled={!signalText.trim()}
+                  disabled={!signalText.trim() || posting}
                   style={{
                     background: "linear-gradient(135deg, hsl(160 60% 20% / 0.3), hsl(200 60% 20% / 0.2))",
                     border: "1px solid hsl(160 50% 40% / 0.3)",
@@ -158,14 +245,23 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
                   }}
                 >
                   <Send className="w-3 h-3" />
-                  Signal
+                  {posting ? "Sending..." : "Signal"}
                 </button>
               </div>
             </div>
 
+            {/* Empty state */}
+            {signals.length === 0 && (
+              <div className="text-center py-16">
+                <Radio className="w-10 h-10 mx-auto text-sky-200/15 mb-4" />
+                <p className="font-display text-sm text-sky-200/30 tracking-wider">No signals yet</p>
+                <p className="font-body text-xs text-sky-200/20 mt-1">Be the first to broadcast a signal to GAIA-1</p>
+              </div>
+            )}
+
             {/* Signals */}
-            {MOCK_SIGNALS.map((signal) => {
-              const av = AVATAR_STYLES[signal.avatar];
+            {signals.map((signal) => {
+              const av = AVATAR_STYLES[signal.citizen_avatar ?? 0];
               const isEnergized = energized.has(signal.id);
               return (
                 <div
@@ -187,24 +283,13 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className="font-display text-xs tracking-wider text-sky-100/90">{signal.author}</span>
-                        <span className="font-body text-[10px] text-sky-200/30">{signal.time}</span>
+                        <span className="font-display text-xs tracking-wider text-sky-100/90">{signal.citizen_name}</span>
+                        <span className="font-body text-[10px] text-sky-200/30">{timeAgo(signal.created_at)}</span>
                       </div>
-                      <p className="font-body text-sm text-sky-100/65 leading-relaxed">{signal.text}</p>
-                      {signal.image && (
-                        <div className="mt-3 h-32 rounded-lg" style={{
-                          background: "linear-gradient(135deg, hsl(160 40% 12%), hsl(220 40% 15%), hsl(280 30% 15%))",
-                          border: "1px solid hsl(160 30% 25% / 0.2)",
-                        }}>
-                          <div className="w-full h-full flex items-center justify-center font-body text-xs text-sky-200/30">
-                            [ Visual Signal ]
-                          </div>
-                        </div>
-                      )}
-                      {/* Actions */}
+                      <p className="font-body text-sm text-sky-100/65 leading-relaxed">{signal.content}</p>
                       <div className="flex items-center gap-4 mt-3">
                         <button
-                          onClick={() => toggleEnergy(signal.id)}
+                          onClick={() => toggleEnergy(signal.id, signal.energy)}
                           className="flex items-center gap-1.5 transition-all duration-300 hover:scale-110"
                           style={{ color: isEnergized ? "hsl(50 90% 60%)" : "hsl(220 15% 40%)" }}
                         >
@@ -228,94 +313,19 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
 
         {/* ═══ BROADCAST ZONE ═══ */}
         {activeTab === "broadcast" && (
-          <div className="space-y-4">
-            <p className="font-body text-xs text-sky-200/40 text-center tracking-wider mb-2">
-              Holographic Stage — Broadcasts from Citizens
-            </p>
-            {MOCK_BROADCASTS.map((bc) => (
-              <div
-                key={bc.id}
-                className="rounded-xl p-5 transition-all duration-500 hover:translate-y-[-2px] relative overflow-hidden"
-                style={{
-                  background: bc.live
-                    ? "linear-gradient(135deg, hsl(160 30% 8% / 0.7), hsl(200 30% 10% / 0.5))"
-                    : "hsl(220 25% 6% / 0.5)",
-                  border: `1px solid ${bc.live ? "hsl(160 50% 40% / 0.3)" : "hsl(200 30% 20% / 0.15)"}`,
-                  backdropFilter: "blur(12px)",
-                }}
-              >
-                {bc.live && (
-                  <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="font-display text-[10px] tracking-wider text-red-400">LIVE</span>
-                  </div>
-                )}
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-lg flex items-center justify-center" style={{
-                    background: "linear-gradient(135deg, hsl(280 40% 15%), hsl(200 40% 15%))",
-                    border: "1px solid hsl(280 30% 30% / 0.3)",
-                  }}>
-                    <Play className="w-6 h-6 text-sky-200/50" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-display text-sm tracking-wider text-sky-100/90">{bc.title}</h3>
-                    <p className="font-body text-xs text-sky-200/40 mt-1">{bc.author} · {bc.type}</p>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <Zap className="w-3 h-3 text-yellow-400/70" />
-                      <span className="font-display text-[11px] text-yellow-400/60 tracking-wider">{bc.energy}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="text-center py-16">
+            <Tv className="w-10 h-10 mx-auto text-sky-200/15 mb-4" />
+            <p className="font-display text-sm text-sky-200/30 tracking-wider">Broadcast Zone</p>
+            <p className="font-body text-xs text-sky-200/20 mt-1">Holographic stage coming soon</p>
           </div>
         )}
 
         {/* ═══ IDEA EXCHANGE ═══ */}
         {activeTab === "ideas" && (
-          <div className="space-y-4">
-            <p className="font-body text-xs text-sky-200/40 text-center tracking-wider mb-2">
-              Neural Network — Collaborative Innovation
-            </p>
-            {MOCK_IDEAS.map((idea) => (
-              <div
-                key={idea.id}
-                className="rounded-xl p-5 transition-all duration-500 hover:translate-y-[-2px] relative"
-                style={{
-                  background: "hsl(220 25% 6% / 0.5)",
-                  border: "1px solid hsl(280 30% 25% / 0.2)",
-                  backdropFilter: "blur(12px)",
-                }}
-              >
-                {/* Connection lines decoration */}
-                <div className="absolute top-0 left-6 w-px h-full" style={{
-                  background: "linear-gradient(180deg, transparent, hsl(280 50% 40% / 0.15), transparent)",
-                }} />
-                <div className="relative">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-2 h-2 rounded-full" style={{
-                      background: idea.status === "active" ? "hsl(160 84% 50%)" : "hsl(220 20% 35%)",
-                      boxShadow: idea.status === "active" ? "0 0 8px hsl(160 84% 50% / 0.5)" : "none",
-                    }} />
-                    <span className="font-display text-[10px] tracking-wider uppercase" style={{
-                      color: idea.status === "active" ? "hsl(160 84% 60%)" : "hsl(220 15% 45%)",
-                    }}>{idea.status}</span>
-                  </div>
-                  <h3 className="font-display text-sm tracking-wider text-sky-100/90 mb-1">{idea.title}</h3>
-                  <p className="font-body text-xs text-sky-200/40">{idea.author}</p>
-                  <div className="flex items-center gap-4 mt-3">
-                    <div className="flex items-center gap-1.5 text-sky-200/40">
-                      <MessageSquare className="w-3 h-3" />
-                      <span className="font-display text-[11px] tracking-wider">{idea.replies}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-yellow-400/50">
-                      <Zap className="w-3 h-3" />
-                      <span className="font-display text-[11px] tracking-wider">{idea.energy}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="text-center py-16">
+            <Brain className="w-10 h-10 mx-auto text-sky-200/15 mb-4" />
+            <p className="font-display text-sm text-sky-200/30 tracking-wider">Idea Exchange</p>
+            <p className="font-body text-xs text-sky-200/20 mt-1">Neural network threads coming soon</p>
           </div>
         )}
 
@@ -325,11 +335,17 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
             <p className="font-body text-xs text-sky-200/40 text-center tracking-wider mb-2">
               Citizens of GAIA-1
             </p>
-            {MOCK_CITIZENS.map((c, i) => {
+            {citizens.length === 0 && (
+              <div className="text-center py-16">
+                <Users className="w-10 h-10 mx-auto text-sky-200/15 mb-4" />
+                <p className="font-body text-xs text-sky-200/20">No citizens have landed yet</p>
+              </div>
+            )}
+            {citizens.map((c) => {
               const av = AVATAR_STYLES[c.avatar];
               return (
                 <div
-                  key={i}
+                  key={c.id}
                   className="rounded-xl p-4 flex items-center gap-4 transition-all duration-300 hover:translate-y-[-1px]"
                   style={{
                     background: "hsl(220 25% 6% / 0.5)",
@@ -345,11 +361,12 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-display text-xs tracking-wider text-sky-100/90">{c.name}</p>
-                    <p className="font-body text-[10px] text-sky-200/35 mt-0.5">{c.sign} · {c.talents.join(", ")}</p>
+                    <p className="font-body text-[10px] text-sky-200/35 mt-0.5">
+                      {c.star_sign} · {c.talents.join(", ")}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-1 text-yellow-400/50 shrink-0">
-                    <Zap className="w-3 h-3" />
-                    <span className="font-display text-[11px] tracking-wider">{c.energy}</span>
+                  <div className="font-body text-[10px] text-sky-200/25 shrink-0">
+                    {timeAgo(c.created_at)}
                   </div>
                 </div>
               );

@@ -14,7 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      citizens: {
+        Row: {
+          avatar: number
+          created_at: string
+          id: string
+          name: string
+          passcode: string
+          star_sign: string
+          talents: string[]
+        }
+        Insert: {
+          avatar?: number
+          created_at?: string
+          id?: string
+          name: string
+          passcode: string
+          star_sign: string
+          talents?: string[]
+        }
+        Update: {
+          avatar?: number
+          created_at?: string
+          id?: string
+          name?: string
+          passcode?: string
+          star_sign?: string
+          talents?: string[]
+        }
+        Relationships: []
+      }
+      signals: {
+        Row: {
+          citizen_id: string
+          content: string
+          created_at: string
+          energy: number
+          id: string
+          signal_type: string
+        }
+        Insert: {
+          citizen_id: string
+          content: string
+          created_at?: string
+          energy?: number
+          id?: string
+          signal_type?: string
+        }
+        Update: {
+          citizen_id?: string
+          content?: string
+          created_at?: string
+          energy?: number
+          id?: string
+          signal_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signals_citizen_id_fkey"
+            columns: ["citizen_id"]
+            isOneToOne: false
+            referencedRelation: "citizens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
