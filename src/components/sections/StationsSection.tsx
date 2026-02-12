@@ -5,12 +5,14 @@ import { useNavigate } from "react-router-dom";
 import signalIcon from "@/assets/signal-abde.png";
 import livingstonerIcon from "@/assets/livingstoner-collectable.png";
 import shuffleIcon from "@/assets/shuffle-pass.png";
+import omegaVol1 from "@/assets/omega-vol1.jpeg";
+import omegaVol2 from "@/assets/omega-vol2.png";
+import omegaVol3 from "@/assets/omega-vol3.png";
 
 const volumes = [
-  { title: "OMEGA Back at it", color: "from-space-cyan to-glow-blue" },
-  { title: "OMEGA Can't stop rep'n the L", color: "from-secondary to-space-pink" },
-  { title: "OMEGA Development", color: "from-green-500 to-space-cyan" },
-  { title: "OMEGA Evolution", color: "from-orange-500 to-destructive" },
+  { title: "OMEGA Back at it", color: "from-space-cyan to-glow-blue", image: omegaVol1 },
+  { title: "OMEGA Can't stop rep'n the L", color: "from-secondary to-space-pink", image: omegaVol2 },
+  { title: "OMEGA Development", color: "from-green-500 to-space-cyan", image: omegaVol3 },
 ];
 
 function VolumesStation() {
@@ -28,7 +30,7 @@ function VolumesStation() {
         </h3>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {volumes.map((volume, index) => (
           <a 
             key={index}
@@ -39,23 +41,15 @@ function VolumesStation() {
           >
             <HolographicCard className="group perspective-1000 cursor-pointer">
               <div className="relative aspect-square mb-4 rounded-lg overflow-hidden">
-                {/* Rotating disc effect */}
-                <div className={`
-                  absolute inset-4 rounded-full bg-gradient-to-br ${volume.color}
-                  group-hover:animate-spin
-                  transition-all duration-300
-                `} style={{ animationDuration: "3s" }}>
-                  {/* Center hole */}
-                  <div className="absolute inset-1/3 rounded-full bg-background" />
-                </div>
-                
-                {/* Disc grooves */}
-                <div className="absolute inset-4 rounded-full border border-foreground/10" />
-                <div className="absolute inset-8 rounded-full border border-foreground/10" />
-                <div className="absolute inset-12 rounded-full border border-foreground/10" />
+                {/* Album cover image */}
+                <img 
+                  src={volume.image} 
+                  alt={volume.title} 
+                  className="absolute inset-0 w-full h-full object-cover rounded-lg transition-transform duration-500 group-hover:scale-105"
+                />
                 
                 {/* Play button overlay */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
                   <div className="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center">
                     <Play className="w-6 h-6 text-primary-foreground ml-1" />
                   </div>

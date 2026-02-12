@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import gameMusic from '@/assets/game-music.mp3';
 import playbuoyLogo from '@/assets/playbuoy-logo.png';
 import omega7Pill from '@/assets/omega7-pill.png';
@@ -83,6 +84,10 @@ interface PlaybuoyGameProps {
 }
 
 export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
+  const isMobile = useIsMobile();
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   const [player, setPlayer] = useState<Player>({
     lane: 1,
     isDucking: false,
@@ -205,16 +210,14 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
         setTrialCompleted(true);
         const code = generateAccessCode();
         setAccessCode(code);
-        // Automatically trigger access callback
+        // Exit fullscreen and navigate to access gate
+        exitFullscreen();
+        // Stop the game and go to access gate
         setTimeout(() => {
+          setGameState(s => ({ ...s, status: 'menu' }));
           onTrialComplete?.(code);
         }, 1500);
-        setTimeout(() => {
-          setGameState(s => ({ ...s, levelTransition: true, level: 'OMEGA.A', speed: LEVEL_CONFIG['OMEGA.A'].baseSpeed }));
-          setTimeout(() => {
-            setGameState(s => ({ ...s, levelTransition: false }));
-          }, 1500);
-        }, 0);
+        return { ...prev, score: newScore, levelTransition: false };
       }
 
       return { ...prev, speed: newSpeed, score: newScore };
@@ -255,6 +258,26 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
     }
   }, [gameState.speed, gameState.status, gameState.level, spawnObstacle, checkCollision]);
 
+  // Fullscreen helpers
+  const enterFullscreen = useCallback(() => {
+    if (gameContainerRef.current && isMobile) {
+      gameContainerRef.current.requestFullscreen?.().then(() => setIsFullscreen(true)).catch(() => {});
+    }
+  }, [isMobile]);
+
+  const exitFullscreen = useCallback(() => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.().then(() => setIsFullscreen(false)).catch(() => {});
+    }
+  }, []);
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
+  }, []);
+
   const startGame = useCallback((gender: Gender) => {
     hasTransitionedRef.current = false;
     setTrialCompleted(false);
@@ -271,7 +294,9 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
     }));
     lastSpawnRef.current = 0;
     obstacleIdRef.current = 0;
-  }, []);
+    // Enter fullscreen on mobile when game starts
+    setTimeout(() => enterFullscreen(), 100);
+  }, [enterFullscreen]);
 
   const movePlayer = useCallback((direction: 'left' | 'right') => {
     if (gameState.status !== 'playing') return;
@@ -372,7 +397,7 @@ export default function PlaybuoyGame({ onTrialComplete }: PlaybuoyGameProps) {
     : `linear-gradient(180deg, hsl(270 50% 8%) 0%, hsl(280 60% 15%) 40%, hsl(270 50% 12%) 100%)`;
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black font-sans">
+    <div ref={gameContainerRef} className="relative w-full h-screen overflow-hidden bg-black font-sans">
       {/* Loading Screen */}
       {gameState.status === 'loading' && (
         <div 
