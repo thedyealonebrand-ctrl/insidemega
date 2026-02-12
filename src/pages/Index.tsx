@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Monitor, Smartphone } from "lucide-react";
 import SpaceBackground from "@/components/space/SpaceBackground";
 import { HeroSection } from "@/components/sections/HeroSection";
 import PlaybuoyGame from "@/components/game/PlaybuoyGame";
@@ -6,6 +7,7 @@ import { AccessGateSection } from "@/components/sections/AccessGateSection";
 import { StationsSection } from "@/components/sections/StationsSection";
 
 const Index = () => {
+  const [viewMode, setViewMode] = useState<"pc" | "mobile">("pc");
   const [trialComplete, setTrialComplete] = useState(false);
   const [accessGranted, setAccessGranted] = useState(false);
   const [generatedCode, setGeneratedCode] = useState<string | null>(null);
@@ -44,7 +46,25 @@ const Index = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-background overflow-x-hidden">
+    <div className={`relative min-h-screen bg-background overflow-x-hidden ${viewMode === "mobile" ? "max-w-[390px] mx-auto border-x border-primary/20 shadow-2xl" : ""}`}>
+      {/* Viewport Toggle */}
+      <div className="fixed top-4 right-4 z-[60] flex items-center gap-1 bg-background/80 backdrop-blur-sm border border-primary/30 rounded-lg p-1">
+        <button
+          onClick={() => setViewMode("pc")}
+          className={`p-2 rounded-md transition-colors ${viewMode === "pc" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          title="PC Mode"
+        >
+          <Monitor className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => setViewMode("mobile")}
+          className={`p-2 rounded-md transition-colors ${viewMode === "mobile" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          title="Mobile Mode"
+        >
+          <Smartphone className="w-4 h-4" />
+        </button>
+      </div>
+
       {/* 3D Space Background */}
       <SpaceBackground />
 
