@@ -84,7 +84,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      verify_citizen_passcode: {
+        Args: { p_name: string; p_passcode: string }
+        Returns: {
+          avatar: number
+          id: string
+          name: string
+          star_sign: string
+          talents: string[]
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

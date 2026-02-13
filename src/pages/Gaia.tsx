@@ -15,7 +15,6 @@ interface CitizenData {
   starSign: string;
   talents: string[];
   avatar: number;
-  passcode: string;
 }
 
 const Gaia = () => {
@@ -34,7 +33,7 @@ const Gaia = () => {
   const handleReenter = useCallback(() => setPhase("reentry"), []);
   const handleBack = useCallback(() => setPhase("landing"), []);
 
-  const handleCitizenComplete = useCallback(async (data: Omit<CitizenData, "id">) => {
+  const handleCitizenComplete = useCallback(async (data: Omit<CitizenData, "id"> & { passcode: string }) => {
     // Save to database
     const { data: row, error } = await supabase
       .from("citizens")
@@ -53,7 +52,7 @@ const Gaia = () => {
       return;
     }
 
-    const fullCitizen: CitizenData = { ...data, id: (row as any).id };
+    const fullCitizen: CitizenData = { id: (row as any).id, name: data.name, starSign: data.starSign, talents: data.talents, avatar: data.avatar };
     setCitizen(fullCitizen);
     localStorage.setItem("gaia-citizen-name", data.name);
     setExistingCitizenName(data.name);

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface GaiaReentryProps {
   citizenName: string;
-  onSuccess: (citizen: { id: string; name: string; starSign: string; talents: string[]; avatar: number; passcode: string }) => void;
+  onSuccess: (citizen: { id: string; name: string; starSign: string; talents: string[]; avatar: number }) => void;
   onBack: () => void;
 }
 
@@ -19,25 +19,21 @@ export default function GaiaReentry({ citizenName, onSuccess, onBack }: GaiaReen
     setError("");
 
     const { data, error: dbError } = await supabase
-      .from("citizens")
-      .select("*")
-      .eq("name", citizenName)
-      .eq("passcode", passcode)
-      .maybeSingle();
+      .rpc("verify_citizen_passcode", { p_name: citizenName, p_passcode: passcode });
 
-    if (dbError || !data) {
+    if (dbError || !data || data.length === 0) {
       setError("Invalid passcode. Try again.");
       setLoading(false);
       return;
     }
 
+    const row = data[0];
     onSuccess({
-      id: data.id,
-      name: data.name,
-      starSign: data.star_sign,
-      talents: data.talents,
-      avatar: data.avatar,
-      passcode: data.passcode,
+      id: row.id,
+      name: row.name,
+      starSign: row.star_sign,
+      talents: row.talents,
+      avatar: row.avatar,
     });
   };
 
