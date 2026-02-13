@@ -8,7 +8,6 @@ interface CitizenData {
   starSign: string;
   talents: string[];
   avatar: number;
-  passcode: string;
 }
 
 interface GaiaHubProps {
