@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { HolographicPanel } from "@/components/ui/HolographicPanel";
 import { HoloInput } from "@/components/ui/HoloInput";
 import { GlowButton } from "@/components/ui/GlowButton";
-import { Lock, Key, ShieldCheck, AlertTriangle, Unlock, Sparkles, Copy, Check } from "lucide-react";
+import { Lock, Key, ShieldCheck, AlertTriangle, Unlock, Sparkles, Copy, Check, X, Play, Pause, Volume2 } from "lucide-react";
+import ounceTrack from "@/assets/ounce-track.mp3";
 
 // X (Twitter) Icon component
 const XIcon = ({ className }: { className?: string }) => (
@@ -22,9 +23,10 @@ interface AccessGateSectionProps {
   isUnlocked?: boolean;
   generatedCode?: string | null;
   onAccessGranted?: () => void;
+  onClose?: () => void;
 }
 
-export function AccessGateSection({ isUnlocked = false, generatedCode = null, onAccessGranted }: AccessGateSectionProps) {
+export function AccessGateSection({ isUnlocked = false, generatedCode = null, onAccessGranted, onClose }: AccessGateSectionProps) {
   const [code, setCode] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [displayedCode, setDisplayedCode] = useState<string | null>(null);
@@ -32,6 +34,36 @@ export function AccessGateSection({ isUnlocked = false, generatedCode = null, on
   const [copied, setCopied] = useState(false);
   const [followedX, setFollowedX] = useState(false);
   const [followedInstagram, setFollowedInstagram] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [trackProgress, setTrackProgress] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio(ounceTrack);
+    audioRef.current.volume = 0.7;
+    const audio = audioRef.current;
+    const onTimeUpdate = () => {
+      if (audio.duration) setTrackProgress(audio.currentTime / audio.duration);
+    };
+    const onEnded = () => { setIsPlaying(false); setTrackProgress(0); };
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("ended", onEnded);
+    return () => {
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("ended", onEnded);
+      audio.pause();
+    };
+  }, []);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(console.error);
+    }
+    setIsPlaying(!isPlaying);
+  };
 
   const hasFollowedBoth = followedX && followedInstagram;
 
@@ -290,17 +322,65 @@ export function AccessGateSection({ isUnlocked = false, generatedCode = null, on
                 ✓ Authentication successful. Realm access unlocked.
               </p>
             </div>
+
+            {/* Track Player */}
+            <div className="p-4 rounded-xl" style={{
+              background: 'linear-gradient(135deg, hsl(270 40% 8% / 0.8), hsl(200 50% 10% / 0.6))',
+              border: '1px solid hsl(270 50% 40% / 0.3)',
+            }}>
+              <p className="font-body text-xs text-muted-foreground uppercase tracking-wider mb-1">Listen Now</p>
+              <p className="font-display text-sm text-primary text-glow-cyan tracking-wider mb-3">
+                OUNCE — OMEGA THE FIRST
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={togglePlay}
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(270 60% 50%), hsl(200 80% 50%))',
+                    boxShadow: isPlaying ? '0 0 20px hsl(270 60% 50% / 0.5)' : 'none',
+                  }}
+                >
+                  {isPlaying ? <Pause className="w-4 h-4 text-white" /> : <Play className="w-4 h-4 text-white ml-0.5" />}
+                </button>
+                <div className="flex-1">
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'hsl(220 20% 15%)' }}>
+                    <div
+                      className="h-full rounded-full transition-all duration-200"
+                      style={{
+                        width: `${trackProgress * 100}%`,
+                        background: 'linear-gradient(90deg, hsl(270 60% 50%), hsl(200 80% 50%))',
+                        boxShadow: '0 0 8px hsl(270 60% 50% / 0.5)',
+                      }}
+                    />
+                  </div>
+                </div>
+                <Volume2 className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </div>
             
             <GlowButton 
               variant="primary" 
               size="lg" 
               className="w-full"
               onClick={() => {
+                if (audioRef.current) { audioRef.current.pause(); setIsPlaying(false); }
                 document.getElementById('stations')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
               Enter The Realm
             </GlowButton>
+
+            <button
+              onClick={() => {
+                if (audioRef.current) { audioRef.current.pause(); setIsPlaying(false); }
+                onClose?.();
+              }}
+              className="w-full py-2 font-body text-xs text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider flex items-center justify-center gap-1.5"
+            >
+              <X className="w-3.5 h-3.5" />
+              Close
+            </button>
           </div>
         )}
         
