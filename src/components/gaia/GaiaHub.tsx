@@ -87,7 +87,7 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
 
     const citizenIds = [...new Set(signalRows.map((s: any) => s.citizen_id))];
     const { data: citizenRows } = await supabase
-      .from("citizens")
+      .from("citizen_profiles")
       .select("id, name, avatar")
       .in("id", citizenIds);
 
@@ -108,7 +108,7 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
   // Load citizens
   const loadCitizens = useCallback(async () => {
     const { data } = await supabase
-      .from("citizens")
+      .from("citizen_profiles")
       .select("id, name, star_sign, talents, avatar, created_at")
       .order("created_at", { ascending: false })
       .limit(50);
