@@ -34,7 +34,10 @@ const Gaia = () => {
   const handleReenter = useCallback(() => setPhase("reentry"), []);
   const handleBack = useCallback(() => setPhase("landing"), []);
 
+  const [citizenError, setCitizenError] = useState<string | null>(null);
+
   const handleCitizenComplete = useCallback(async (data: Omit<CitizenData, "id"> & { passcode: string }) => {
+    setCitizenError(null);
     // Save to database
     const { data: row, error } = await supabase
       .from("citizens")
@@ -48,8 +51,16 @@ const Gaia = () => {
       .select("id")
       .single();
 
-    if (error || !row) {
-      console.error("Failed to save citizen:", error);
+    if (error) {
+      if (error.code === "23505") {
+        setCitizenError("This name is already taken. Choose another.");
+      } else {
+        setCitizenError("Failed to create citizen. Please try again.");
+      }
+      return;
+    }
+    if (!row) {
+      setCitizenError("Failed to create citizen. Please try again.");
       return;
     }
 
@@ -134,7 +145,7 @@ const Gaia = () => {
             />
           )}
           {phase === "announcement" && <GaiaAnnouncement onContinue={() => setPhase("citizen")} />}
-          {phase === "citizen" && <GaiaCitizenCreation onComplete={handleCitizenComplete} />}
+          {phase === "citizen" && <GaiaCitizenCreation onComplete={handleCitizenComplete} error={citizenError} />}
           {phase === "reentry" && existingCitizenName && (
             <GaiaReentry
               citizenName={existingCitizenName}
