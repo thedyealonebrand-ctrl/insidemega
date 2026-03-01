@@ -74,6 +74,13 @@ export type Database = {
             foreignKeyName: "signals_citizen_id_fkey"
             columns: ["citizen_id"]
             isOneToOne: false
+            referencedRelation: "citizen_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signals_citizen_id_fkey"
+            columns: ["citizen_id"]
+            isOneToOne: false
             referencedRelation: "citizens"
             referencedColumns: ["id"]
           },
@@ -81,7 +88,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      citizen_profiles: {
+        Row: {
+          avatar: number | null
+          created_at: string | null
+          id: string | null
+          name: string | null
+          star_sign: string | null
+          talents: string[] | null
+        }
+        Insert: {
+          avatar?: number | null
+          created_at?: string | null
+          id?: string | null
+          name?: string | null
+          star_sign?: string | null
+          talents?: string[] | null
+        }
+        Update: {
+          avatar?: number | null
+          created_at?: string | null
+          id?: string | null
+          name?: string | null
+          star_sign?: string | null
+          talents?: string[] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       verify_citizen_passcode: {
