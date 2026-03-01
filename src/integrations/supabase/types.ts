@@ -65,6 +65,46 @@ export type Database = {
         }
         Relationships: []
       }
+      signal_energies: {
+        Row: {
+          citizen_id: string
+          created_at: string
+          signal_id: string
+        }
+        Insert: {
+          citizen_id: string
+          created_at?: string
+          signal_id: string
+        }
+        Update: {
+          citizen_id?: string
+          created_at?: string
+          signal_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signal_energies_citizen_id_fkey"
+            columns: ["citizen_id"]
+            isOneToOne: false
+            referencedRelation: "citizen_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signal_energies_citizen_id_fkey"
+            columns: ["citizen_id"]
+            isOneToOne: false
+            referencedRelation: "citizens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signal_energies_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "signals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signals: {
         Row: {
           citizen_id: string
@@ -138,6 +178,10 @@ export type Database = {
       }
     }
     Functions: {
+      toggle_signal_energy: {
+        Args: { p_citizen_id: string; p_signal_id: string }
+        Returns: number
+      }
       verify_citizen_passcode: {
         Args: { p_name: string; p_passcode: string }
         Returns: {
