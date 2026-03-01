@@ -44,6 +44,27 @@ export type Database = {
         }
         Relationships: []
       }
+      passcode_attempts: {
+        Row: {
+          attempt_time: string
+          citizen_name: string
+          id: string
+          success: boolean
+        }
+        Insert: {
+          attempt_time?: string
+          citizen_name: string
+          id?: string
+          success?: boolean
+        }
+        Update: {
+          attempt_time?: string
+          citizen_name?: string
+          id?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       signals: {
         Row: {
           citizen_id: string

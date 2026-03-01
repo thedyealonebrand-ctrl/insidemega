@@ -21,7 +21,16 @@ export default function GaiaReentry({ citizenName, onSuccess, onBack }: GaiaReen
     const { data, error: dbError } = await supabase
       .rpc("verify_citizen_passcode", { p_name: citizenName, p_passcode: passcode });
 
-    if (dbError || !data || data.length === 0) {
+    if (dbError) {
+      const msg = dbError.message?.includes("Too many failed attempts")
+        ? "Too many failed attempts. Try again in 15 minutes."
+        : "Invalid passcode. Try again.";
+      setError(msg);
+      setLoading(false);
+      return;
+    }
+
+    if (!data || data.length === 0) {
       setError("Invalid passcode. Try again.");
       setLoading(false);
       return;

@@ -11,6 +11,7 @@ interface CitizenData {
 
 interface GaiaCitizenCreationProps {
   onComplete: (citizen: CitizenData) => void;
+  error?: string | null;
 }
 
 const STAR_SIGNS = [
@@ -34,7 +35,7 @@ const AVATAR_STYLES = [
   { bg: "linear-gradient(135deg, #38bdf8, #818cf8)", emoji: "🧬" },
 ];
 
-export default function GaiaCitizenCreation({ onComplete }: GaiaCitizenCreationProps) {
+export default function GaiaCitizenCreation({ onComplete, error: externalError }: GaiaCitizenCreationProps) {
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
   const [citizen, setCitizen] = useState<CitizenData>({
@@ -281,6 +282,13 @@ export default function GaiaCitizenCreation({ onComplete }: GaiaCitizenCreationP
             </div>
           )}
         </div>
+
+        {/* Error display */}
+        {externalError && (
+          <div className="text-center mt-4">
+            <p className="font-body text-sm text-red-400/80">{externalError}</p>
+          </div>
+        )}
 
         {/* CTA */}
         <div className="flex justify-center mt-10">
