@@ -72,6 +72,17 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
   const [energized, setEnergized] = useState<Set<string>>(new Set());
   const [posting, setPosting] = useState(false);
 
+  // Load which signals this citizen has energized
+  const loadEnergized = useCallback(async () => {
+    const { data } = await supabase
+      .from("signal_energies")
+      .select("signal_id")
+      .eq("citizen_id", citizen.id);
+    if (data) {
+      setEnergized(new Set(data.map((d: any) => d.signal_id)));
+    }
+  }, [citizen.id]);
+
   // Load signals with citizen info
   const loadSignals = useCallback(async () => {
     const { data: signalRows } = await supabase
@@ -118,6 +129,7 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
   useEffect(() => {
     loadSignals();
     loadCitizens();
+    loadEnergized();
 
     // Realtime subscription for new signals
     const channel = supabase
@@ -128,7 +140,7 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [loadSignals, loadCitizens]);
+  }, [loadSignals, loadCitizens, loadEnergized]);
 
   const postSignal = async () => {
     if (!signalText.trim() || posting) return;
@@ -143,17 +155,20 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
     loadSignals();
   };
 
-  const toggleEnergy = async (signalId: string, currentEnergy: number) => {
+  const toggleEnergy = async (signalId: string) => {
     const wasEnergized = energized.has(signalId);
+    // Optimistic update
     setEnergized((prev) => {
       const next = new Set(prev);
       wasEnergized ? next.delete(signalId) : next.add(signalId);
       return next;
     });
-    await supabase
-      .from("signals")
-      .update({ energy: currentEnergy + (wasEnergized ? -1 : 1) })
-      .eq("id", signalId);
+    // Use server-side RPC for atomic toggle
+    await supabase.rpc("toggle_signal_energy", {
+      p_signal_id: signalId,
+      p_citizen_id: citizen.id,
+    });
+    loadSignals();
   };
 
   const myAvatar = AVATAR_STYLES[citizen.avatar];
@@ -288,13 +303,13 @@ export default function GaiaHub({ citizen }: GaiaHubProps) {
                       <p className="font-body text-sm text-sky-100/65 leading-relaxed">{signal.content}</p>
                       <div className="flex items-center gap-4 mt-3">
                         <button
-                          onClick={() => toggleEnergy(signal.id, signal.energy)}
+                          onClick={() => toggleEnergy(signal.id)}
                           className="flex items-center gap-1.5 transition-all duration-300 hover:scale-110"
                           style={{ color: isEnergized ? "hsl(50 90% 60%)" : "hsl(220 15% 40%)" }}
                         >
                           <Zap className="w-3.5 h-3.5" fill={isEnergized ? "currentColor" : "none"} />
                           <span className="font-display text-[11px] tracking-wider">
-                            {signal.energy + (isEnergized ? 1 : 0)}
+                            {signal.energy}
                           </span>
                         </button>
                         <button className="flex items-center gap-1.5 text-sky-200/30 hover:text-sky-200/60 transition-colors">
