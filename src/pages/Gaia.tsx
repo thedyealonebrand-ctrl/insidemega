@@ -3,11 +3,12 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import GaiaPlanetBackground from "@/components/gaia/GaiaPlanetBackground";
 import GaiaLanding from "@/components/gaia/GaiaLanding";
+import GaiaAnnouncement from "@/components/gaia/GaiaAnnouncement";
 import GaiaCitizenCreation from "@/components/gaia/GaiaCitizenCreation";
 import GaiaReentry from "@/components/gaia/GaiaReentry";
 import GaiaHub from "@/components/gaia/GaiaHub";
 
-type GaiaPhase = "landing" | "citizen" | "reentry" | "beaming" | "hub";
+type GaiaPhase = "landing" | "announcement" | "citizen" | "reentry" | "beaming" | "hub";
 
 interface CitizenData {
   id: string;
@@ -28,7 +29,7 @@ const Gaia = () => {
     if (stored) setExistingCitizenName(stored);
   }, []);
 
-  const handleLand = useCallback(() => setPhase("citizen"), []);
+  const handleLand = useCallback(() => setPhase("announcement"), []);
   const handleLearn = useCallback(() => setPhase("citizen"), []);
   const handleReenter = useCallback(() => setPhase("reentry"), []);
   const handleBack = useCallback(() => setPhase("landing"), []);
@@ -132,6 +133,7 @@ const Gaia = () => {
               hasExistingCitizen={!!existingCitizenName}
             />
           )}
+          {phase === "announcement" && <GaiaAnnouncement onContinue={() => setPhase("citizen")} />}
           {phase === "citizen" && <GaiaCitizenCreation onComplete={handleCitizenComplete} />}
           {phase === "reentry" && existingCitizenName && (
             <GaiaReentry
