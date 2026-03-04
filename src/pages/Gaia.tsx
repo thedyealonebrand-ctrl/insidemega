@@ -5,10 +5,11 @@ import GaiaPlanetBackground from "@/components/gaia/GaiaPlanetBackground";
 import GaiaLanding from "@/components/gaia/GaiaLanding";
 import GaiaAnnouncement from "@/components/gaia/GaiaAnnouncement";
 import GaiaCitizenCreation from "@/components/gaia/GaiaCitizenCreation";
+import GaiaWalletChoice from "@/components/gaia/GaiaWalletChoice";
 import GaiaReentry from "@/components/gaia/GaiaReentry";
 import GaiaHub from "@/components/gaia/GaiaHub";
 
-type GaiaPhase = "landing" | "announcement" | "citizen" | "reentry" | "beaming" | "hub";
+type GaiaPhase = "landing" | "announcement" | "citizen" | "wallet-choice" | "reentry" | "beaming" | "hub";
 
 interface CitizenData {
   id: string;
@@ -68,8 +69,7 @@ const Gaia = () => {
     setCitizen(fullCitizen);
     localStorage.setItem("gaia-citizen-name", data.name);
     setExistingCitizenName(data.name);
-    setPhase("beaming");
-    setTimeout(() => setPhase("hub"), 2800);
+    setPhase("wallet-choice");
   }, []);
 
   const handleReentrySuccess = useCallback((data: CitizenData) => {
@@ -146,6 +146,15 @@ const Gaia = () => {
           )}
           {phase === "announcement" && <GaiaAnnouncement onContinue={() => setPhase("citizen")} />}
           {phase === "citizen" && <GaiaCitizenCreation onComplete={handleCitizenComplete} error={citizenError} />}
+          {phase === "wallet-choice" && citizen && (
+            <GaiaWalletChoice
+              citizenName={citizen.name}
+              onContinue={() => {
+                setPhase("beaming");
+                setTimeout(() => setPhase("hub"), 2800);
+              }}
+            />
+          )}
           {phase === "reentry" && existingCitizenName && (
             <GaiaReentry
               citizenName={existingCitizenName}

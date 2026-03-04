@@ -10,7 +10,9 @@ const SHARE_TEXT = `I just crossed into the Realm.
 Artists aren't just dropping songs anymore…
 we're building worlds.
 
-October is going to make sense soon.`;
+October is going to make sense soon.
+
+#OMEGAwithFRIENDS #1BUsers`;
 
 const TWITTER_URL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}`;
 const INSTAGRAM_COPY_TEXT = SHARE_TEXT;
