@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_agents: {
+        Row: {
+          agent_name: string
+          citizen_id: string
+          created_at: string
+          id: string
+          personality: string
+          specialty: string
+        }
+        Insert: {
+          agent_name: string
+          citizen_id: string
+          created_at?: string
+          id?: string
+          personality?: string
+          specialty?: string
+        }
+        Update: {
+          agent_name?: string
+          citizen_id?: string
+          created_at?: string
+          id?: string
+          personality?: string
+          specialty?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_agents_citizen_id_fkey"
+            columns: ["citizen_id"]
+            isOneToOne: true
+            referencedRelation: "citizen_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_agents_citizen_id_fkey"
+            columns: ["citizen_id"]
+            isOneToOne: true
+            referencedRelation: "citizens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       citizens: {
         Row: {
           avatar: number

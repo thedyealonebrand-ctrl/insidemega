@@ -6,10 +6,11 @@ import GaiaLanding from "@/components/gaia/GaiaLanding";
 import GaiaAnnouncement from "@/components/gaia/GaiaAnnouncement";
 import GaiaCitizenCreation from "@/components/gaia/GaiaCitizenCreation";
 import GaiaWalletChoice from "@/components/gaia/GaiaWalletChoice";
+import GaiaAgentCreation from "@/components/gaia/GaiaAgentCreation";
 import GaiaReentry from "@/components/gaia/GaiaReentry";
 import GaiaHub from "@/components/gaia/GaiaHub";
 
-type GaiaPhase = "landing" | "announcement" | "citizen" | "wallet-choice" | "reentry" | "beaming" | "hub";
+type GaiaPhase = "landing" | "announcement" | "citizen" | "wallet-choice" | "agent-creation" | "reentry" | "beaming" | "hub";
 
 interface CitizenData {
   id: string;
@@ -145,7 +146,17 @@ const Gaia = () => {
           {phase === "wallet-choice" && citizen && (
             <GaiaWalletChoice
               citizenName={citizen.name}
-              onContinue={() => {
+              onContinue={() => setPhase("agent-creation")}
+            />
+          )}
+          {phase === "agent-creation" && citizen && (
+            <GaiaAgentCreation
+              citizen={citizen}
+              onComplete={() => {
+                setPhase("beaming");
+                setTimeout(() => setPhase("hub"), 2800);
+              }}
+              onSkip={() => {
                 setPhase("beaming");
                 setTimeout(() => setPhase("hub"), 2800);
               }}
