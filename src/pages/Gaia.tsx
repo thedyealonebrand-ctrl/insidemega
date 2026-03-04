@@ -39,18 +39,18 @@ const Gaia = () => {
 
   const handleCitizenComplete = useCallback(async (data: Omit<CitizenData, "id"> & { passcode: string }) => {
     setCitizenError(null);
-    // Save to database
-    const { data: row, error } = await supabase
+    const citizenId = crypto.randomUUID();
+
+    const { error } = await supabase
       .from("citizens")
       .insert({
+        id: citizenId,
         name: data.name,
         star_sign: data.starSign,
         talents: data.talents,
         avatar: data.avatar,
         passcode: data.passcode,
-      })
-      .select("id")
-      .single();
+      });
 
     if (error) {
       if (error.code === "23505") {
@@ -60,12 +60,8 @@ const Gaia = () => {
       }
       return;
     }
-    if (!row) {
-      setCitizenError("Failed to create citizen. Please try again.");
-      return;
-    }
 
-    const fullCitizen: CitizenData = { id: (row as any).id, name: data.name, starSign: data.starSign, talents: data.talents, avatar: data.avatar };
+    const fullCitizen: CitizenData = { id: citizenId, name: data.name, starSign: data.starSign, talents: data.talents, avatar: data.avatar };
     setCitizen(fullCitizen);
     localStorage.setItem("gaia-citizen-name", data.name);
     setExistingCitizenName(data.name);
