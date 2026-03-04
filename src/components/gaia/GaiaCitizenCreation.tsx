@@ -69,7 +69,7 @@ export default function GaiaCitizenCreation({ onComplete, error: externalError }
       case 1: return citizen.starSign !== "";
       case 2: return citizen.talents.length >= 1;
       case 3: return true;
-      case 4: return citizen.passcode.length >= 4 && citizen.passcode.length <= 6;
+      case 4: return citizen.passcode.length >= 6;
       default: return false;
     }
   };
@@ -84,7 +84,7 @@ export default function GaiaCitizenCreation({ onComplete, error: externalError }
     setTimeout(() => setStep((s) => s + 1), 400);
   };
 
-  const stepLabels = ["IDENTITY", "STAR SIGN", "TALENTS", "AVATAR", "PASSCODE"];
+  const stepLabels = ["IDENTITY", "STAR SIGN", "TALENTS", "AVATAR", "PASSWORD"];
   const stepIcons = [User, Star, Sparkles, User, Lock];
 
   return (
@@ -246,18 +246,15 @@ export default function GaiaCitizenCreation({ onComplete, error: externalError }
           {/* Step 4: Passcode */}
           {step === 4 && (
             <div className="text-center space-y-6">
-              <p className="font-body text-sm text-sky-100/60">Create a 4–6 digit passcode to re-enter GAIA-1</p>
+              <p className="font-body text-sm text-sky-100/60">Create a password (min 6 characters) to re-enter GAIA-1</p>
               <div className="relative max-w-xs mx-auto">
                 <input
                   type="password"
-                  maxLength={6}
+                  maxLength={32}
                   value={citizen.passcode}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/\D/g, "");
-                    setCitizen({ ...citizen, passcode: v });
-                  }}
-                  placeholder="● ● ● ●"
-                  className="w-full px-5 py-4 rounded-lg font-display text-xl tracking-[0.5em] text-center outline-none transition-all duration-300 focus:scale-[1.02]"
+                  onChange={(e) => setCitizen({ ...citizen, passcode: e.target.value })}
+                  placeholder="Enter password..."
+                  className="w-full px-5 py-4 rounded-lg font-display text-sm tracking-wider text-center outline-none transition-all duration-300 focus:scale-[1.02]"
                   style={{
                     background: "hsl(220 30% 8% / 0.8)",
                     border: "1px solid hsl(280 60% 30% / 0.3)",
@@ -265,19 +262,9 @@ export default function GaiaCitizenCreation({ onComplete, error: externalError }
                     boxShadow: "0 0 20px hsl(280 60% 50% / 0.05), inset 0 0 20px hsl(280 60% 50% / 0.03)",
                   }}
                 />
-                {/* Digit indicators */}
-                <div className="flex justify-center gap-3 mt-4">
-                  {[0, 1, 2, 3, 4, 5].map((i) => (
-                    <div
-                      key={i}
-                      className="w-2.5 h-2.5 rounded-full transition-all duration-300"
-                      style={{
-                        background: i < citizen.passcode.length ? "hsl(280 80% 65%)" : "hsl(220 20% 18%)",
-                        boxShadow: i < citizen.passcode.length ? "0 0 8px hsl(280 80% 65% / 0.5)" : "none",
-                      }}
-                    />
-                  ))}
-                </div>
+                <p className="font-body text-[10px] text-sky-200/30 mt-3">
+                  {citizen.passcode.length}/6+ characters
+                </p>
               </div>
             </div>
           )}
