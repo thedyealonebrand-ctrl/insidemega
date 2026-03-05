@@ -15,7 +15,7 @@ export default function GaiaWalletChoice({ citizenName, onContinue }: GaiaWallet
   }, []);
 
   const handleCreateWallet = () => {
-    window.open("https://www.coinbase.com/wallet", "_blank");
+    window.open("https://help.coinbase.com/en/base/getting-started/get-started", "_blank");
   };
 
   return (
