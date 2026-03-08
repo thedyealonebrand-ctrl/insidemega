@@ -97,7 +97,7 @@ export default function GaiaWalletChoice({ citizenName, onContinue }: GaiaWallet
           }}
         >
           <p className="font-body text-xs tracking-wider leading-relaxed" style={{ color: "hsl(40 80% 70%)" }}>
-            💡 Post your <span className="font-bold">Base wallet address</span> as your first Signal inside GAIA-1 — let the civilization know you've arrived.
+            💡 Post your <span className="font-bold">MetaMask wallet address</span> as your first Signal inside GAIA-1 — let the civilization know you've arrived.
           </p>
         </div>
       </div>
