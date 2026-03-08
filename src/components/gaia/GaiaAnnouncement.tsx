@@ -12,7 +12,7 @@ we're building worlds.
 
 October is going to make sense soon.
 
-#OMEGAwithFRIENDS #1BUsers`;
+#OMEGAwithFRIENDS #Web3Culture`;
 
 const TWITTER_URL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}`;
 const INSTAGRAM_COPY_TEXT = SHARE_TEXT;
