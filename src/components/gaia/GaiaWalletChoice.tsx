@@ -68,7 +68,7 @@ export default function GaiaWalletChoice({ citizenName, onContinue }: GaiaWallet
             }}
           >
             <Wallet className="w-4 h-4" />
-            Create Base Wallet
+            Create MetaMask Wallet
             <ExternalLink className="w-3 h-3 opacity-50" />
           </button>
 
