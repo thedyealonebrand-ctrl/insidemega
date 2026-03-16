@@ -77,7 +77,7 @@ export function AccessGateSection({ isUnlocked = false, generatedCode = null, on
   }, []);
 
   const handleFollowX = () => {
-    window.open('https://x.com/7ROO7H_Base', '_blank');
+    window.open('https://x.com/The7_is_a_T', '_blank');
     setFollowedX(true);
   };
 
